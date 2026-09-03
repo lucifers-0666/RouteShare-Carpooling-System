@@ -13,15 +13,17 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Health Check Endpoint
-app.get('/api/health', (req, res) => {
+// Health Check Endpoints
+const healthHandler = (req, res) => {
   res.status(200).json({
     status: 'OK',
     service: 'Sahyān Carpooling API Server',
     version: '1.0.0',
     timestamp: new Date().toISOString(),
   });
-});
+};
+app.get('/api/health', healthHandler);
+app.get('/api/v1/health', healthHandler);
 
 // API v1 Routes
 app.use('/api/v1/auth', authRoutes);

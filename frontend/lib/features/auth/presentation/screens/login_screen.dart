@@ -209,8 +209,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     const SizedBox(height: 16),
 
                     // Stitch Trust Indicators
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 12,
+                      runSpacing: 8,
                       children: [
                         _buildTrustBadge(Icons.check_circle_outline_rounded, 'Verified community'),
                         _buildTrustBadge(Icons.shield_outlined, 'Safe shared rides'),
