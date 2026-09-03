@@ -1,76 +1,268 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/network/api_client.dart';
+import '../../../core/storage/secure_storage_service.dart';
 import '../../../shared/models/user_model.dart';
+import '../data/auth_repository.dart';
+
+enum AuthStatus { initial, loading, authenticated, unauthenticated, error }
 
 class AuthState {
-  final bool isAuthenticated;
+  final AuthStatus status;
   final UserModel? user;
-  final bool isLoading;
+  final String? token;
+  final String? errorMessage;
   final String? otpSentToPhone;
+  final String? devOtp;
 
   const AuthState({
-    this.isAuthenticated = false,
+    this.status = AuthStatus.initial,
     this.user,
-    this.isLoading = false,
+    this.token,
+    this.errorMessage,
     this.otpSentToPhone,
+    this.devOtp,
   });
 
+  bool get isAuthenticated => status == AuthStatus.authenticated;
+  bool get isLoading => status == AuthStatus.loading;
+
   AuthState copyWith({
-    bool? isAuthenticated,
+    AuthStatus? status,
     UserModel? user,
-    bool? isLoading,
+    String? token,
+    String? errorMessage,
     String? otpSentToPhone,
+    String? devOtp,
   }) {
     return AuthState(
-      isAuthenticated: isAuthenticated ?? this.isAuthenticated,
+      status: status ?? this.status,
       user: user ?? this.user,
-      isLoading: isLoading ?? this.isLoading,
+      token: token ?? this.token,
+      errorMessage: errorMessage,
       otpSentToPhone: otpSentToPhone ?? this.otpSentToPhone,
+      devOtp: devOtp ?? this.devOtp,
     );
   }
 }
 
 class AuthNotifier extends StateNotifier<AuthState> {
-  AuthNotifier() : super(const AuthState());
+  final AuthRepository repository;
+  final SecureStorageService storageService;
+  final ApiClient apiClient;
 
-  Future<void> sendOtp(String phone) async {
-    state = state.copyWith(isLoading: true);
-    await Future.delayed(const Duration(milliseconds: 600));
-    state = state.copyWith(
-      isLoading: false,
-      otpSentToPhone: phone,
-    );
+  AuthNotifier({
+    required this.repository,
+    required this.storageService,
+    required this.apiClient,
+  }) : super(const AuthState()) {
+    checkAuthStatus();
+  }
+
+  /// On App Startup: Check secure storage and restore session
+  Future<void> checkAuthStatus() async {
+    state = state.copyWith(status: AuthStatus.loading);
+    try {
+      final token = await storageService.getToken();
+      final storedUser = await storageService.getUser();
+
+      if (token != null && token.isNotEmpty) {
+        apiClient.setAuthToken(token);
+        UserModel? user = storedUser;
+        try {
+          user = await repository.getProfile();
+        } catch (_) {
+          // Use cached user if network fails temporarily
+        }
+
+        if (user != null) {
+          state = state.copyWith(
+            status: AuthStatus.authenticated,
+            token: token,
+            user: user,
+          );
+          return;
+        }
+      }
+
+      state = state.copyWith(status: AuthStatus.unauthenticated);
+    } catch (_) {
+      state = state.copyWith(status: AuthStatus.unauthenticated);
+    }
+  }
+
+  Future<bool> login({
+    required String identifier,
+    required String password,
+  }) async {
+    state = state.copyWith(status: AuthStatus.loading, errorMessage: null);
+    try {
+      final result = await repository.login(
+        identifier: identifier,
+        password: password,
+      );
+
+      final token = result['token'] as String;
+      final user = result['user'] as UserModel;
+
+      state = state.copyWith(
+        status: AuthStatus.authenticated,
+        token: token,
+        user: user,
+      );
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: e.toString(),
+      );
+      return false;
+    }
+  }
+
+  Future<bool> register({
+    required String name,
+    required String email,
+    required String phone,
+    required String password,
+  }) async {
+    state = state.copyWith(status: AuthStatus.loading, errorMessage: null);
+    try {
+      final result = await repository.register(
+        name: name,
+        email: email,
+        phone: phone,
+        password: password,
+      );
+
+      final token = result['token'] as String;
+      final user = result['user'] as UserModel;
+      final devOtp = result['devOtp'] as String?;
+
+      state = state.copyWith(
+        status: AuthStatus.authenticated,
+        token: token,
+        user: user,
+        otpSentToPhone: phone,
+        devOtp: devOtp,
+      );
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: e.toString(),
+      );
+      return false;
+    }
+  }
+
+  Future<bool> sendOtp(String phone) async {
+    state = state.copyWith(status: AuthStatus.loading, errorMessage: null);
+    try {
+      final result = await repository.sendOtp(phone);
+      state = state.copyWith(
+        status: AuthStatus.unauthenticated,
+        otpSentToPhone: phone,
+        devOtp: result['devOtp'] as String?,
+      );
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: e.toString(),
+      );
+      return false;
+    }
   }
 
   Future<bool> verifyOtp(String otp) async {
-    state = state.copyWith(isLoading: true);
-    await Future.delayed(const Duration(milliseconds: 600));
+    state = state.copyWith(status: AuthStatus.loading, errorMessage: null);
+    try {
+      final phone = state.otpSentToPhone ?? state.user?.phone ?? '';
+      final result = await repository.verifyOtp(phone: phone, otp: otp);
 
-    // Mock successful OTP verification
-    const mockUser = UserModel(
-      id: 'usr_arjun_99',
-      name: 'Arjun Patel',
-      phone: '+91 9876543210',
-      email: 'arjun.patel@example.com',
-      city: 'Ahmedabad',
-      verificationStatus: UserVerificationStatus.verified,
-      rating: 4.9,
-      totalRides: 14,
-    );
+      final token = result['token'] as String;
+      final user = result['user'] as UserModel;
 
-    state = state.copyWith(
-      isLoading: false,
-      isAuthenticated: true,
-      user: mockUser,
-    );
-
-    return true;
+      state = state.copyWith(
+        status: AuthStatus.authenticated,
+        token: token,
+        user: user,
+      );
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: e.toString(),
+      );
+      return false;
+    }
   }
 
-  void logout() {
-    state = const AuthState();
+  Future<bool> forgotPassword(String email) async {
+    state = state.copyWith(status: AuthStatus.loading, errorMessage: null);
+    try {
+      await repository.forgotPassword(email);
+      state = state.copyWith(status: AuthStatus.unauthenticated);
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: e.toString(),
+      );
+      return false;
+    }
+  }
+
+  Future<bool> resetPassword({
+    required String token,
+    required String newPassword,
+  }) async {
+    state = state.copyWith(status: AuthStatus.loading, errorMessage: null);
+    try {
+      await repository.resetPassword(token: token, newPassword: newPassword);
+      state = state.copyWith(status: AuthStatus.unauthenticated);
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: e.toString(),
+      );
+      return false;
+    }
+  }
+
+  Future<void> logout() async {
+    await storageService.clearSession();
+    apiClient.setAuthToken(null);
+    state = const AuthState(status: AuthStatus.unauthenticated);
   }
 }
 
+// Global Providers
+final apiClientProvider = Provider<ApiClient>((ref) {
+  return ApiClient();
+});
+
+final secureStorageServiceProvider = Provider<SecureStorageService>((ref) {
+  return SecureStorageService();
+});
+
+final authRepositoryProvider = Provider<AuthRepository>((ref) {
+  final apiClient = ref.watch(apiClientProvider);
+  final storageService = ref.watch(secureStorageServiceProvider);
+  return AuthRepositoryImpl(
+    apiClient: apiClient,
+    storageService: storageService,
+  );
+});
+
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
-  return AuthNotifier();
+  final repo = ref.watch(authRepositoryProvider);
+  final storage = ref.watch(secureStorageServiceProvider);
+  final api = ref.watch(apiClientProvider);
+  return AuthNotifier(
+    repository: repo,
+    storageService: storage,
+    apiClient: api,
+  );
 });

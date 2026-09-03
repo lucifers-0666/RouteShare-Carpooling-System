@@ -13,7 +13,7 @@ void main() {
     // Verify Sahyān brand text renders on Splash Screen
     expect(find.text('Sahyān'), findsOneWidget);
 
-    // Allow splash timer to complete
-    await tester.pumpAndSettle(const Duration(seconds: 3));
+    // Pump past splash timer
+    await tester.pump(const Duration(seconds: 3));
   });
 }

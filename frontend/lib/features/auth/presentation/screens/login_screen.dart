@@ -15,26 +15,46 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
-  final TextEditingController _phoneController = TextEditingController(text: '9876543210');
+  final TextEditingController _identifierController = TextEditingController(text: '9876543210');
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   void dispose() {
-    _phoneController.dispose();
+    _identifierController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
-  void _handleSendOtp() async {
-    final phone = _phoneController.text.trim();
-    if (phone.length < 10) {
+  void _handleLogin() async {
+    final identifier = _identifierController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (identifier.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a valid 10-digit mobile number')),
+        const SnackBar(content: Text('Please enter mobile number or email')),
       );
       return;
     }
 
-    await ref.read(authProvider.notifier).sendOtp('+91 $phone');
-    if (mounted) {
-      context.push('/otp');
+    if (password.isEmpty) {
+      // If password is empty, attempt OTP login path
+      await ref.read(authProvider.notifier).sendOtp(identifier);
+      if (mounted) context.push('/otp');
+      return;
+    }
+
+    final success = await ref.read(authProvider.notifier).login(
+          identifier: identifier,
+          password: password,
+        );
+
+    if (success && mounted) {
+      context.go('/home');
+    } else if (mounted) {
+      final errorMsg = ref.read(authProvider).errorMessage;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMsg ?? 'Invalid credentials')),
+      );
     }
   }
 
@@ -45,12 +65,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return Scaffold(
       backgroundColor: AppColors.warmBackground,
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 32),
+              const SizedBox(height: 24),
               // Brand Icon
               Row(
                 children: [
@@ -73,48 +93,69 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 36),
+              const SizedBox(height: 32),
 
-              Text('Welcome to Sahyān', style: AppTypography.screenTitle),
-              const SizedBox(height: 8),
+              Text('Welcome Back', style: AppTypography.screenTitle),
+              const SizedBox(height: 6),
               Text(
-                'Enter your mobile number to get started with route-based carpooling',
+                'Enter your credentials to sign in to your Sahyān account',
                 style: AppTypography.secondary,
               ),
-              const SizedBox(height: 36),
+              const SizedBox(height: 32),
 
-              // Mobile Input
+              // Identifier Input
               AppTextField(
-                label: 'Mobile Number',
-                hint: '98765 43210',
-                controller: _phoneController,
-                keyboardType: TextInputType.phone,
-                prefixIcon: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                label: 'Mobile Number or Email',
+                hint: '98765 43210 or email@example.com',
+                controller: _identifierController,
+                keyboardType: TextInputType.emailAddress,
+                prefixIcon: const Icon(Icons.person_outline_rounded, color: AppColors.primaryForest, size: 20),
+              ),
+              const SizedBox(height: 14),
+
+              // Password Input
+              AppTextField(
+                label: 'Password',
+                hint: 'Enter your password',
+                controller: _passwordController,
+                obscureText: true,
+                prefixIcon: const Icon(Icons.lock_outline_rounded, color: AppColors.primaryForest, size: 20),
+              ),
+
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () => context.push('/forgot-password'),
                   child: Text(
-                    '+91',
-                    style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold),
+                    'Forgot Password?',
+                    style: AppTypography.caption.copyWith(color: AppColors.primaryForest, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
 
-              const Spacer(),
+              const SizedBox(height: 24),
 
               PrimaryButton(
-                text: 'Send OTP',
+                text: 'Sign In',
                 isLoading: authState.isLoading,
-                onPressed: _handleSendOtp,
+                onPressed: _handleLogin,
               ),
 
               const SizedBox(height: 16),
-              Center(
-                child: Text(
-                  'By continuing, you agree to Sahyān\'s Terms & Privacy Policy',
-                  style: AppTypography.caption,
-                  textAlign: TextAlign.center,
-                ),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("Don't have an account?", style: AppTypography.secondary),
+                  TextButton(
+                    onPressed: () => context.push('/register'),
+                    child: Text(
+                      'Register Now',
+                      style: AppTypography.bodyMedium.copyWith(color: AppColors.primaryForest, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 16),
             ],
           ),
         ),
