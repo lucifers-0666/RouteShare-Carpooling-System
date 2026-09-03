@@ -1,0 +1,102 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import '../../features/auth/presentation/screens/splash_screen.dart';
+import '../../features/auth/presentation/screens/login_screen.dart';
+import '../../features/auth/presentation/screens/otp_screen.dart';
+import '../../features/home/presentation/screens/home_screen.dart';
+import '../../features/rides/presentation/screens/search_results_screen.dart';
+import '../../features/rides/presentation/screens/ride_details_screen.dart';
+import '../../features/rides/presentation/screens/seat_selection_screen.dart';
+import '../../features/bookings/presentation/screens/confirm_pay_screen.dart';
+import '../../features/bookings/presentation/screens/booking_confirmation_screen.dart';
+import '../../features/bookings/presentation/screens/my_bookings_screen.dart';
+import '../../features/profile/presentation/screens/profile_screen.dart';
+import '../../shared/widgets/app_shell.dart';
+
+final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
+
+final appRouter = GoRouter(
+  navigatorKey: _rootNavigatorKey,
+  initialLocation: '/',
+  routes: [
+    GoRoute(
+      path: '/',
+      builder: (context, state) => const SplashScreen(),
+    ),
+    GoRoute(
+      path: '/login',
+      builder: (context, state) => const LoginScreen(),
+    ),
+    GoRoute(
+      path: '/otp',
+      builder: (context, state) => const OtpScreen(),
+    ),
+    GoRoute(
+      path: '/search-results',
+      builder: (context, state) => const SearchResultsScreen(),
+    ),
+    GoRoute(
+      path: '/ride-details',
+      builder: (context, state) => const RideDetailsScreen(),
+    ),
+    GoRoute(
+      path: '/seat-selection',
+      builder: (context, state) => const SeatSelectionScreen(),
+    ),
+    GoRoute(
+      path: '/confirm-pay',
+      builder: (context, state) => const ConfirmPayScreen(),
+    ),
+    GoRoute(
+      path: '/booking-confirmation',
+      builder: (context, state) => const BookingConfirmationScreen(),
+    ),
+
+    // Bottom Navigation Shell
+    StatefulShellRoute.indexedStack(
+      builder: (context, state, navigationShell) {
+        return AppShell(navigationShell: navigationShell);
+      },
+      branches: [
+        // Tab 1: Find Ride (Home)
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/home',
+              builder: (context, state) => const HomeScreen(),
+            ),
+          ],
+        ),
+        // Tab 2: Offer Ride
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/offer-ride',
+              builder: (context, state) => const Scaffold(
+                body: Center(child: Text('Offer a Ride Screen')),
+              ),
+            ),
+          ],
+        ),
+        // Tab 3: My Bookings
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/my-bookings',
+              builder: (context, state) => const MyBookingsScreen(),
+            ),
+          ],
+        ),
+        // Tab 4: Profile
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/profile',
+              builder: (context, state) => const ProfileScreen(),
+            ),
+          ],
+        ),
+      ],
+    ),
+  ],
+);
