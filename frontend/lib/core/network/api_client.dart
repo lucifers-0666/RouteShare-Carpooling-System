@@ -25,6 +25,10 @@ class ApiClient {
         _client = client ?? http.Client();
 
   static String get _defaultBaseUrl {
+    const String envUrl = String.fromEnvironment('API_BASE_URL');
+    if (envUrl.isNotEmpty) {
+      return envUrl;
+    }
     if (kIsWeb) {
       return 'http://localhost:5000/api/v1';
     }
