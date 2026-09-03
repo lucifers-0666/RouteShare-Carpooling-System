@@ -66,100 +66,181 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       backgroundColor: AppColors.warmBackground,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 24),
-              // Brand Icon
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: AppColors.softForest,
-                      borderRadius: BorderRadius.circular(12),
+              // Stitch Header Banner
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
+                decoration: const BoxDecoration(
+                  color: AppColors.softForest,
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(32),
+                    bottomRight: Radius.circular(32),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryForest,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Icon(
+                            Icons.directions_car_filled_rounded,
+                            color: AppColors.white,
+                            size: 22,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          'Sahyān',
+                          style: AppTypography.screenTitle.copyWith(
+                            color: AppColors.deepForest,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
-                    child: const Icon(
-                      Icons.directions_car_filled_rounded,
-                      color: AppColors.primaryForest,
-                      size: 28,
+                    const SizedBox(height: 20),
+                    Text(
+                      'Find people going\nyour way.',
+                      style: AppTypography.screenTitle.copyWith(
+                        color: AppColors.deepForest,
+                        fontSize: 26,
+                        height: 1.2,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    'Sahyān',
-                    style: AppTypography.screenTitle.copyWith(color: AppColors.deepForest),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 32),
-
-              Text('Welcome Back', style: AppTypography.screenTitle),
-              const SizedBox(height: 6),
-              Text(
-                'Enter your credentials to sign in to your Sahyān account',
-                style: AppTypography.secondary,
-              ),
-              const SizedBox(height: 32),
-
-              // Identifier Input
-              AppTextField(
-                label: 'Mobile Number or Email',
-                hint: '98765 43210 or email@example.com',
-                controller: _identifierController,
-                keyboardType: TextInputType.emailAddress,
-                prefixIcon: const Icon(Icons.person_outline_rounded, color: AppColors.primaryForest, size: 20),
-              ),
-              const SizedBox(height: 14),
-
-              // Password Input
-              AppTextField(
-                label: 'Password',
-                hint: 'Enter your password',
-                controller: _passwordController,
-                obscureText: true,
-                prefixIcon: const Icon(Icons.lock_outline_rounded, color: AppColors.primaryForest, size: 20),
-              ),
-
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () => context.push('/forgot-password'),
-                  child: Text(
-                    'Forgot Password?',
-                    style: AppTypography.caption.copyWith(color: AppColors.primaryForest, fontWeight: FontWeight.bold),
-                  ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Share your journey with verified people travelling along the same route.',
+                      style: AppTypography.secondary.copyWith(
+                        color: AppColors.textSecondary,
+                        height: 1.4,
+                      ),
+                    ),
+                  ],
                 ),
               ),
 
-              const SizedBox(height: 24),
-
-              PrimaryButton(
-                text: 'Sign In',
-                isLoading: authState.isLoading,
-                onPressed: _handleLogin,
-              ),
-
-              const SizedBox(height: 16),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text("Don't have an account?", style: AppTypography.secondary),
-                  TextButton(
-                    onPressed: () => context.push('/register'),
-                    child: Text(
-                      'Register Now',
-                      style: AppTypography.bodyMedium.copyWith(color: AppColors.primaryForest, fontWeight: FontWeight.bold),
+              // Form Body
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Sign In',
+                      style: AppTypography.screenTitle.copyWith(
+                        color: AppColors.deepForest,
+                        fontSize: 20,
+                      ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 18),
+
+                    // Identifier Input
+                    AppTextField(
+                      label: 'Mobile Number or Email',
+                      hint: '98765 43210 or email@example.com',
+                      controller: _identifierController,
+                      keyboardType: TextInputType.emailAddress,
+                      prefixIcon: const Icon(Icons.person_outline_rounded, color: AppColors.primaryForest, size: 20),
+                    ),
+                    const SizedBox(height: 14),
+
+                    // Password Input
+                    AppTextField(
+                      label: 'Password',
+                      hint: 'Enter your password',
+                      controller: _passwordController,
+                      obscureText: true,
+                      prefixIcon: const Icon(Icons.lock_outline_rounded, color: AppColors.primaryForest, size: 20),
+                    ),
+
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: () => context.push('/forgot-password'),
+                        child: Text(
+                          'Forgot Password?',
+                          style: AppTypography.caption.copyWith(
+                            color: AppColors.primaryForest,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    PrimaryButton(
+                      text: 'Sign In',
+                      isLoading: authState.isLoading,
+                      onPressed: _handleLogin,
+                    ),
+
+                    const SizedBox(height: 14),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("Don't have an account?", style: AppTypography.secondary),
+                        TextButton(
+                          onPressed: () => context.push('/register'),
+                          child: Text(
+                            'Register Now',
+                            style: AppTypography.bodyMedium.copyWith(
+                              color: AppColors.primaryForest,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 24),
+                    const Divider(color: AppColors.border, height: 1),
+                    const SizedBox(height: 16),
+
+                    // Stitch Trust Indicators
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _buildTrustBadge(Icons.check_circle_outline_rounded, 'Verified community'),
+                        _buildTrustBadge(Icons.shield_outlined, 'Safe shared rides'),
+                        _buildTrustBadge(Icons.payments_outlined, 'Fair contribution'),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildTrustBadge(IconData icon, String label) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 14, color: AppColors.mutedSage),
+        const SizedBox(width: 4),
+        Text(
+          label,
+          style: AppTypography.caption.copyWith(
+            fontSize: 11,
+            color: AppColors.textSecondary,
+          ),
+        ),
+      ],
     );
   }
 }

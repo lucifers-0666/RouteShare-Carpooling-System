@@ -4,6 +4,7 @@ import '../../features/auth/presentation/screens/splash_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/auth/presentation/screens/forgot_password_screen.dart';
+import '../../features/auth/presentation/screens/reset_password_screen.dart';
 import '../../features/auth/presentation/screens/otp_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/rides/presentation/screens/search_results_screen.dart';
@@ -36,6 +37,13 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/forgot-password',
       builder: (context, state) => const ForgotPasswordScreen(),
+    ),
+    GoRoute(
+      path: '/reset-password',
+      builder: (context, state) {
+        final token = state.extra as String?;
+        return ResetPasswordScreen(initialToken: token);
+      },
     ),
     GoRoute(
       path: '/otp',
