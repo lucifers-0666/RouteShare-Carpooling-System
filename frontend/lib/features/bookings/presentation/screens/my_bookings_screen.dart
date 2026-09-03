@@ -49,17 +49,22 @@ class MyBookingsScreen extends ConsumerWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                            decoration: BoxDecoration(
-                              color: AppColors.softBrass,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(
-                              'Pending Driver Approval',
-                              style: AppTypography.caption.copyWith(color: AppColors.mutedBrass, fontWeight: FontWeight.bold),
+                          Flexible(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: AppColors.softBrass,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                'Pending Driver Approval',
+                                style: AppTypography.caption.copyWith(color: AppColors.mutedBrass, fontWeight: FontWeight.bold),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
                           ),
+                          const SizedBox(width: 8),
                           Text(
                             '₹${booking.totalAmount.toStringAsFixed(0)}',
                             style: AppTypography.sectionHeader.copyWith(color: AppColors.primaryForest),

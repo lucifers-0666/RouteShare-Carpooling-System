@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../app/providers/app_startup_provider.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_typography.dart';
-import '../auth_provider.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -21,25 +21,12 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerPr
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1200),
+      duration: const Duration(milliseconds: 900),
     );
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeIn),
     );
-
     _controller.forward();
-
-    // Session restoration check
-    Future.delayed(const Duration(seconds: 2), () {
-      if (mounted) {
-        final authState = ref.read(authProvider);
-        if (authState.isAuthenticated) {
-          context.go('/home');
-        } else {
-          context.go('/login');
-        }
-      }
-    });
   }
 
   @override
@@ -48,8 +35,38 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerPr
     super.dispose();
   }
 
+  void _handleNavigation(AppStartupStatus status) {
+    if (!mounted) return;
+    switch (status) {
+      case AppStartupStatus.onboardingRequired:
+        context.go('/onboarding');
+        break;
+      case AppStartupStatus.authEntryRequired:
+        context.go('/auth-entry');
+        break;
+      case AppStartupStatus.ready:
+        context.go('/home');
+        break;
+      case AppStartupStatus.initializing:
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    ref.listen<AppStartupState>(appStartupProvider, (previous, next) {
+      if (next.status != AppStartupStatus.initializing) {
+        _handleNavigation(next.status);
+      }
+    });
+
+    final startupState = ref.watch(appStartupProvider);
+    if (startupState.status != AppStartupStatus.initializing) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _handleNavigation(startupState.status);
+      });
+    }
+
     return Scaffold(
       backgroundColor: AppColors.deepForest,
       body: Center(

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../app/providers/user_mode_provider.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_typography.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/verification_badge.dart';
 import '../../../../core/widgets/rating_display.dart';
+import '../../../../shared/widgets/auth_gate_dialog.dart';
 import '../rides_provider.dart';
 
 class RideDetailsScreen extends ConsumerWidget {
@@ -57,7 +59,14 @@ class RideDetailsScreen extends ConsumerWidget {
                         children: [
                           Row(
                             children: [
-                              Text(ride.driverName, style: AppTypography.sectionHeader),
+                              Flexible(
+                                child: Text(
+                                  ride.driverName,
+                                  style: AppTypography.sectionHeader,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
                               const SizedBox(width: 6),
                               VerificationBadge(isVerified: ride.isDriverVerified),
                             ],
@@ -221,6 +230,16 @@ class RideDetailsScreen extends ConsumerWidget {
               child: PrimaryButton(
                 text: 'Select Seats',
                 onPressed: () {
+                  final isGuest = ref.read(userModeProvider).isGuest;
+                  if (isGuest) {
+                    AuthGateDialog.show(
+                      context,
+                      title: 'Sign In to Book Seats',
+                      message: 'To reserve seats and communicate with verified drivers, please sign in or register.',
+                      intendedRoute: '/seat-selection',
+                    );
+                    return;
+                  }
                   context.push('/seat-selection');
                 },
               ),

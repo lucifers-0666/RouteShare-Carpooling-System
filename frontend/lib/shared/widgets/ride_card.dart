@@ -151,19 +151,31 @@ class RideCard extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            Text(
-                              ride.driverName,
-                              style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
+                            Flexible(
+                              child: Text(
+                                ride.driverName,
+                                style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
                             const SizedBox(width: 6),
                             VerificationBadge(isVerified: ride.isDriverVerified),
                           ],
                         ),
+                        const SizedBox(height: 2),
                         Row(
                           children: [
                             RatingDisplay(rating: ride.driverRating),
-                            const SizedBox(width: 8),
-                            Text('•  ${ride.vehicle.fullName}', style: AppTypography.caption),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                '• ${ride.vehicle.fullName}',
+                                style: AppTypography.caption,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
                           ],
                         ),
                       ],

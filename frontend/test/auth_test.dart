@@ -32,6 +32,14 @@ class MockSecureStorageService implements SecureStorageService {
     _token = null;
     _user = null;
   }
+
+  bool _completedOnboarding = false;
+
+  @override
+  Future<void> setCompletedOnboarding(bool completed) async => _completedOnboarding = completed;
+
+  @override
+  Future<bool> hasCompletedOnboarding() async => _completedOnboarding;
 }
 
 class MockAuthRepository implements AuthRepository {

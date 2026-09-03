@@ -7,9 +7,19 @@ class SecureStorageService {
 
   static const String _keyToken = 'sahyan_auth_token';
   static const String _keyUser = 'sahyan_user_data';
+  static const String _keyOnboardingCompleted = 'sahyan_onboarding_completed';
 
   SecureStorageService({FlutterSecureStorage? storage})
       : _storage = storage ?? const FlutterSecureStorage();
+
+  Future<void> setCompletedOnboarding(bool completed) async {
+    await _storage.write(key: _keyOnboardingCompleted, value: completed ? 'true' : 'false');
+  }
+
+  Future<bool> hasCompletedOnboarding() async {
+    final val = await _storage.read(key: _keyOnboardingCompleted);
+    return val == 'true';
+  }
 
   Future<void> saveToken(String token) async {
     await _storage.write(key: _keyToken, value: token);

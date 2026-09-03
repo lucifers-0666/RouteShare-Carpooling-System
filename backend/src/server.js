@@ -8,6 +8,6 @@ const PORT = process.env.PORT || 5000;
 connectDB();
 
 app.listen(PORT, () => {
-  console.log(`🚗 Sahyān Backend Server running on port ${PORT}`);
-  console.log(`🌐 Health Check: http://localhost:${PORT}/api/health`);
+  console.log(`[SERVER] Sahyān Backend Server running on port ${PORT}`);
+  console.log(`[HEALTH] Health Check: http://localhost:${PORT}/api/health`);
 });

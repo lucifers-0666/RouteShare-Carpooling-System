@@ -18,8 +18,8 @@ class OtpService {
     const isDev = process.env.NODE_ENV !== 'production';
     if (isDev || process.env.ENABLE_DEV_OTP_LOG === 'true') {
       console.log(`\n========================================`);
-      console.log(`📲 [DEV OTP PROVIDER] Sent OTP to ${recipient}`);
-      console.log(`🔑 OTP CODE: ${otpCode} (Valid for 10 minutes)`);
+      console.log(`[DEV OTP PROVIDER] Sent OTP to ${recipient}`);
+      console.log(`[OTP CODE]: ${otpCode} (Valid for 10 minutes)`);
       console.log(`========================================\n`);
     }
     return { success: true, recipient, message: 'OTP dispatched successfully' };

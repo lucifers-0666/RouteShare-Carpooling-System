@@ -44,6 +44,19 @@ const userSchema = new mongoose.Schema(
       enum: ['user', 'admin'],
       default: 'user',
     },
+    capabilities: {
+      canRide: { type: Boolean, default: true },
+      canDrive: { type: Boolean, default: false },
+    },
+    driverProfile: {
+      onboardingStatus: {
+        type: String,
+        enum: ['not_started', 'in_progress', 'submitted', 'approved', 'rejected'],
+        default: 'not_started',
+      },
+      licenseNumber: { type: String, default: '' },
+      verifiedAt: Date,
+    },
     rating: {
       average: { type: Number, default: 4.9 },
       count: { type: Number, default: 0 },

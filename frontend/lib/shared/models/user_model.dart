@@ -12,6 +12,10 @@ class UserModel extends Equatable {
   final UserVerificationStatus verificationStatus;
   final double rating;
   final int totalRides;
+  final String role;
+  final bool canRide;
+  final bool canDrive;
+  final String driverOnboardingStatus;
 
   const UserModel({
     required this.id,
@@ -23,24 +27,40 @@ class UserModel extends Equatable {
     required this.verificationStatus,
     required this.rating,
     required this.totalRides,
+    this.role = 'user',
+    this.canRide = true,
+    this.canDrive = false,
+    this.driverOnboardingStatus = 'not_started',
   });
 
   bool get isVerified => verificationStatus == UserVerificationStatus.verified;
+  bool get isDriverEligible => canDrive && driverOnboardingStatus == 'approved';
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
+    final capabilities = json['capabilities'] as Map<String, dynamic>?;
+    final driverProfile = json['driverProfile'] as Map<String, dynamic>?;
+
     return UserModel(
-      id: json['id'] ?? '',
+      id: json['id'] ?? json['_id']?.toString() ?? '',
       name: json['name'] ?? '',
       phone: json['phone'] ?? '',
       email: json['email'] ?? '',
-      profilePhoto: json['profilePhoto'],
+      profilePhoto: json['profilePhoto'] ?? json['profileImage'],
       city: json['city'] ?? '',
       verificationStatus: UserVerificationStatus.values.firstWhere(
         (e) => e.name == json['verificationStatus'],
-        orElse: () => UserVerificationStatus.pending,
+        orElse: () => json['isVerified'] == true ? UserVerificationStatus.verified : UserVerificationStatus.pending,
       ),
-      rating: (json['rating'] as num?)?.toDouble() ?? 0.0,
-      totalRides: json['totalRides'] ?? 0,
+      rating: json['rating'] is Map
+          ? ((json['rating']['average'] as num?)?.toDouble() ?? 4.9)
+          : ((json['rating'] as num?)?.toDouble() ?? 4.9),
+      totalRides: json['rating'] is Map
+          ? ((json['rating']['count'] as num?)?.toInt() ?? 0)
+          : (json['totalRides'] ?? 0),
+      role: json['role'] ?? 'user',
+      canRide: capabilities?['canRide'] ?? json['canRide'] ?? true,
+      canDrive: capabilities?['canDrive'] ?? json['canDrive'] ?? false,
+      driverOnboardingStatus: driverProfile?['onboardingStatus'] ?? json['driverOnboardingStatus'] ?? 'not_started',
     );
   }
 
@@ -55,6 +75,10 @@ class UserModel extends Equatable {
       'verificationStatus': verificationStatus.name,
       'rating': rating,
       'totalRides': totalRides,
+      'role': role,
+      'canRide': canRide,
+      'canDrive': canDrive,
+      'driverOnboardingStatus': driverOnboardingStatus,
     };
   }
 
@@ -69,5 +93,9 @@ class UserModel extends Equatable {
         verificationStatus,
         rating,
         totalRides,
+        role,
+        canRide,
+        canDrive,
+        driverOnboardingStatus,
       ];
 }

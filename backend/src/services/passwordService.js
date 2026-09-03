@@ -23,8 +23,8 @@ class PasswordService {
    */
   logResetLink(email, rawToken) {
     console.log(`\n========================================`);
-    console.log(`📧 [DEV EMAIL PROVIDER] Password reset request for ${email}`);
-    console.log(`🔑 Reset Token: ${rawToken}`);
+    console.log(`[DEV EMAIL PROVIDER] Password reset request for ${email}`);
+    console.log(`[RESET TOKEN]: ${rawToken}`);
     console.log(`========================================\n`);
   }
 }

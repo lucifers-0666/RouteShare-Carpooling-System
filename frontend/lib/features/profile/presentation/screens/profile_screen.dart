@@ -49,7 +49,14 @@ class ProfileScreen extends ConsumerWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(user?.name ?? 'Arjun Patel', style: AppTypography.screenTitle.copyWith(fontSize: 20)),
+                        Flexible(
+                          child: Text(
+                            user?.name ?? 'Arjun Patel',
+                            style: AppTypography.screenTitle.copyWith(fontSize: 20),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
                         const SizedBox(width: 6),
                         VerificationBadge(isVerified: user?.isVerified ?? true),
                       ],
