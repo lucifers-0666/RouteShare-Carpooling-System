@@ -6,6 +6,16 @@
 
 ---
 
+## Tech Stack
+
+- **Mobile Application**: Flutter (Dart) — Cross-platform iOS & Android mobile application.
+- **Backend REST API**: Node.js + Express.js — Fast, non-blocking asynchronous RESTful server.
+- **Database**: MongoDB (NoSQL) — Selected for built-in **GeoJSON 2dsphere geospatial indexing** (`$near`, `$geoWithin`) for efficient route & proximity matching.
+- **Authentication**: JWT (JSON Web Tokens) + OTP Verification + bcryptjs password hashing.
+- **Maps & Routing**: Google Maps API for geocoding, route calculation, and polyline visualization.
+
+---
+
 ## Technical Architecture & Status
 
 - **Frontend / Mobile Client**: Flutter 3 (Dart) application (`frontend/`) using Riverpod state management, GoRouter navigation, `flutter_secure_storage` session persistence, and `http` network client.
