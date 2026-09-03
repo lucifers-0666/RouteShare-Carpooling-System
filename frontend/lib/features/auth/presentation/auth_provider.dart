@@ -67,11 +67,19 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
       if (token != null && token.isNotEmpty) {
         apiClient.setAuthToken(token);
-        UserModel? user = storedUser;
+        UserModel? user;
         try {
           user = await repository.getProfile();
-        } catch (_) {
-          // Use cached user if network fails temporarily
+          await storageService.saveUser(user);
+        } catch (e) {
+          if (e is ApiException && e.statusCode == 401) {
+            await storageService.clearSession();
+            apiClient.setAuthToken(null);
+            state = state.copyWith(status: AuthStatus.unauthenticated, user: null, token: null);
+            return;
+          }
+          // Network offline fallback: use cached user if available
+          user = storedUser;
         }
 
         if (user != null) {

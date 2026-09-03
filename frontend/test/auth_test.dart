@@ -100,16 +100,19 @@ class MockAuthRepository implements AuthRepository {
   Future<Map<String, dynamic>> resetPassword({required String token, required String newPassword}) async => {'success': true};
 
   @override
-  Future<UserModel> getProfile() async => UserModel(
-        id: 'usr_123',
-        name: 'Arjun Patel',
-        email: 'arjun@example.com',
-        phone: '+919876543210',
-        city: 'Ahmedabad',
-        verificationStatus: UserVerificationStatus.verified,
-        rating: 4.9,
-        totalRides: 10,
-      );
+  Future<UserModel> getProfile() async {
+    if (shouldFail) throw ApiException('Session expired', statusCode: 401);
+    return UserModel(
+      id: 'usr_123',
+      name: 'Arjun Patel',
+      email: 'arjun@example.com',
+      phone: '+919876543210',
+      city: 'Ahmedabad',
+      verificationStatus: UserVerificationStatus.verified,
+      rating: 4.9,
+      totalRides: 10,
+    );
+  }
 }
 
 void main() {
@@ -199,5 +202,38 @@ void main() {
     expect(notifier.state.status, AuthStatus.unauthenticated);
     expect(notifier.state.user, isNull);
     expect(notifier.state.token, isNull);
+  });
+
+  test('Session restoration restores authenticated state when valid token in storage', () async {
+    await storageService.saveToken('valid_stored_jwt_token');
+    
+    final notifier = AuthNotifier(
+      repository: mockRepo,
+      storageService: storageService,
+      apiClient: apiClient,
+    );
+
+    // Wait for checkAuthStatus async execution
+    await Future.delayed(const Duration(milliseconds: 50));
+
+    expect(notifier.state.status, AuthStatus.authenticated);
+    expect(notifier.state.token, 'valid_stored_jwt_token');
+    expect(notifier.state.user?.name, 'Arjun Patel');
+  });
+
+  test('Session restoration clears session and unauthenticates on 401 response', () async {
+    await storageService.saveToken('expired_jwt_token');
+    mockRepo.shouldFail = true;
+
+    final notifier = AuthNotifier(
+      repository: mockRepo,
+      storageService: storageService,
+      apiClient: apiClient,
+    );
+
+    await Future.delayed(const Duration(milliseconds: 50));
+
+    expect(notifier.state.status, AuthStatus.unauthenticated);
+    expect(notifier.state.user, isNull);
   });
 }

@@ -3,10 +3,12 @@ const User = require('../models/User');
 const otpService = require('../services/otpService');
 const passwordService = require('../services/passwordService');
 
+const { getJwtSecret, getJwtExpiresIn } = require('../config/jwt');
+
 const generateAccessToken = (userId) => {
-  const secret = process.env.JWT_SECRET || 'sahyan_super_secret_jwt_key_change_in_production';
+  const secret = getJwtSecret();
   return jwt.sign({ id: userId }, secret, {
-    expiresIn: process.env.JWT_EXPIRES_IN || '7d',
+    expiresIn: getJwtExpiresIn(),
   });
 };
 

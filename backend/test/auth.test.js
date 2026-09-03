@@ -4,6 +4,8 @@ const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const app = require('../src/app');
 const User = require('../src/models/User');
+const jwt = require('jsonwebtoken');
+const { getJwtSecret } = require('../src/config/jwt');
 
 let mongoServer;
 let server;
@@ -228,6 +230,33 @@ test('PROFILE & JWT: Should reject invalid JWT token', async () => {
   const profileData = await profileRes.json();
   assert.strictEqual(profileRes.status, 401);
   assert.strictEqual(profileData.success, false);
+});
+
+test('PROFILE & JWT: Should reject expired JWT token', async () => {
+  const expiredToken = jwt.sign({ id: new mongoose.Types.ObjectId() }, getJwtSecret(), {
+    expiresIn: '0s',
+  });
+
+  const profileRes = await fetch(`${baseUrl}/users/profile`, {
+    headers: { Authorization: `Bearer ${expiredToken}` },
+  });
+  const profileData = await profileRes.json();
+  assert.strictEqual(profileRes.status, 401);
+  assert.strictEqual(profileData.success, false);
+  assert.strictEqual(profileData.message, 'Invalid or expired token.');
+});
+
+test('JWT CONFIG: Should throw clear error if JWT_SECRET environment variable is missing', () => {
+  const originalSecret = process.env.JWT_SECRET;
+  try {
+    delete process.env.JWT_SECRET;
+    assert.throws(
+      () => getJwtSecret(),
+      /FATAL CONFIGURATION ERROR: JWT_SECRET environment variable is missing\./
+    );
+  } finally {
+    process.env.JWT_SECRET = originalSecret;
+  }
 });
 
 test('OTP: Should send and verify OTP successfully', async () => {

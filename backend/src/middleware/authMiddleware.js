@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { getJwtSecret } = require('../config/jwt');
 
 const authenticate = async (req, res, next) => {
   try {
@@ -17,7 +18,7 @@ const authenticate = async (req, res, next) => {
       });
     }
 
-    const secret = process.env.JWT_SECRET || 'sahyan_super_secret_jwt_key_change_in_production';
+    const secret = getJwtSecret();
     const decoded = jwt.verify(token, secret);
 
     const user = await User.findById(decoded.id);
