@@ -6,6 +6,7 @@ const app = require('../src/app');
 const User = require('../src/models/User');
 const jwt = require('jsonwebtoken');
 const { getJwtSecret } = require('../src/config/jwt');
+const passwordService = require('../src/services/passwordService');
 
 let mongoServer;
 let server;
@@ -37,7 +38,7 @@ test.after(async () => {
   server.close();
 });
 
-test('REGISTRATION: Should register a valid user successfully without immediate JWT bypass', async () => {
+test('REGISTRATION: Should register a valid user successfully without returning devOtp or immediate JWT', async () => {
   const payload = {
     name: 'Test Arjun',
     email: 'arjun.test@example.com',
@@ -57,8 +58,8 @@ test('REGISTRATION: Should register a valid user successfully without immediate 
   assert.strictEqual(data.user.email, 'arjun.test@example.com');
   assert.strictEqual(data.user.phone, '+919876543210');
   assert.strictEqual(data.user.isVerified, false);
-  assert.ok(data.devOtp); // 6-digit dev OTP returned for testing
-  assert.strictEqual(data.devOtp.length, 6);
+  assert.strictEqual(data.devOtp, undefined); // No devOtp leaked in response
+  assert.strictEqual(data.accessToken, undefined); // No JWT bypass before OTP verification
 });
 
 test('REGISTRATION: Should reject duplicate email', async () => {
@@ -140,11 +141,71 @@ test('REGISTRATION: Should reject weak password (< 8 chars)', async () => {
   assert.match(data.message, /at least 8 characters/i);
 });
 
+test('REGISTRATION: Should reject password missing uppercase', async () => {
+  const payload = {
+    name: 'No Upper',
+    email: 'noupper@example.com',
+    phone: '9988776656',
+    password: 'password123!',
+  };
+
+  const res = await fetch(`${baseUrl}/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await res.json();
+  assert.strictEqual(res.status, 400);
+  assert.strictEqual(data.success, false);
+  assert.match(data.message, /uppercase/i);
+});
+
+test('REGISTRATION: Should reject password missing lowercase', async () => {
+  const payload = {
+    name: 'No Lower',
+    email: 'nolower@example.com',
+    phone: '9988776657',
+    password: 'PASSWORD123!',
+  };
+
+  const res = await fetch(`${baseUrl}/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await res.json();
+  assert.strictEqual(res.status, 400);
+  assert.strictEqual(data.success, false);
+  assert.match(data.message, /lowercase/i);
+});
+
+test('REGISTRATION: Should reject password missing number', async () => {
+  const payload = {
+    name: 'No Number',
+    email: 'nonumber@example.com',
+    phone: '9988776658',
+    password: 'PasswordNoNumber!',
+  };
+
+  const res = await fetch(`${baseUrl}/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await res.json();
+  assert.strictEqual(res.status, 400);
+  assert.strictEqual(data.success, false);
+  assert.match(data.message, /number/i);
+});
+
 test('REGISTRATION: Should reject password missing special character', async () => {
   const payload = {
     name: 'No Special',
     email: 'nospecial@example.com',
-    phone: '9988776656',
+    phone: '9988776659',
     password: 'Password1234',
   };
 
@@ -160,7 +221,77 @@ test('REGISTRATION: Should reject password missing special character', async () 
   assert.match(data.message, /special character/i);
 });
 
-test('LOGIN: Should log in successfully with valid credentials', async () => {
+test('LOGIN: Should block unverified password login and require phone verification', async () => {
+  const payload = {
+    identifier: 'arjun.test@example.com',
+    password: 'StrongPassword123!',
+  };
+
+  const res = await fetch(`${baseUrl}/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await res.json();
+  assert.strictEqual(res.status, 403);
+  assert.strictEqual(data.success, false);
+  assert.strictEqual(data.isVerified, false);
+  assert.match(data.message, /verify your mobile number/i);
+});
+
+test('OTP: Should reject fixed development bypass OTP values like 123456 or 000000', async () => {
+  const verifyRes = await fetch(`${baseUrl}/auth/verify-otp`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ phone: '9876543210', otp: '123456' }),
+  });
+
+  const verifyData = await verifyRes.json();
+  assert.strictEqual(verifyRes.status, 400);
+  assert.strictEqual(verifyData.success, false);
+  assert.strictEqual(verifyData.message, 'Invalid OTP code');
+});
+
+test('OTP: Should send and verify valid 6-digit cryptographic OTP, transitioning isVerified to true and issuing JWT', async () => {
+  const user = await User.findOne({ phone: '+919876543210' });
+  assert.ok(user && user.otpInfo && user.otpInfo.code);
+  const validOtp = user.otpInfo.code;
+  assert.strictEqual(validOtp.length, 6);
+
+  // Verify OTP
+  const verifyRes = await fetch(`${baseUrl}/auth/verify-otp`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ phone: '9876543210', otp: validOtp }),
+  });
+
+  const verifyData = await verifyRes.json();
+  assert.strictEqual(verifyRes.status, 200);
+  assert.strictEqual(verifyData.success, true);
+  assert.ok(verifyData.accessToken);
+  assert.strictEqual(verifyData.user.isVerified, true);
+
+  // Verify DB state
+  const updatedUser = await User.findOne({ phone: '+919876543210' });
+  assert.strictEqual(updatedUser.isVerified, true);
+  assert.strictEqual(updatedUser.otpInfo?.code, undefined); // Invalidate OTP code after success
+});
+
+test('OTP: Invalidate OTP after success so it cannot be reused', async () => {
+  const verifyRes = await fetch(`${baseUrl}/auth/verify-otp`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ phone: '9876543210', otp: '111111' }),
+  });
+
+  const verifyData = await verifyRes.json();
+  assert.strictEqual(verifyRes.status, 400);
+  assert.strictEqual(verifyData.success, false);
+  assert.match(verifyData.message, /no active otp/i);
+});
+
+test('LOGIN: Should log in successfully with valid credentials after account is verified', async () => {
   const payload = {
     identifier: 'arjun.test@example.com',
     password: 'StrongPassword123!',
@@ -177,6 +308,7 @@ test('LOGIN: Should log in successfully with valid credentials', async () => {
   assert.strictEqual(data.success, true);
   assert.ok(data.accessToken);
   assert.strictEqual(data.user.email, 'arjun.test@example.com');
+  assert.strictEqual(data.user.isVerified, true);
 });
 
 test('LOGIN: Should log in successfully with phone identifier', async () => {
@@ -232,8 +364,82 @@ test('LOGIN: Should reject non-existent user with generic message', async () => 
   assert.strictEqual(data.message, 'Invalid credentials');
 });
 
+test('OTP: Should reject expired OTP', async () => {
+  // Set expired OTP directly in user record
+  const user = await User.findOne({ phone: '+919876543210' });
+  user.otpInfo = {
+    code: '888888',
+    expiresAt: new Date(Date.now() - 60 * 1000), // 1 min ago
+    attempts: 1,
+    verificationAttempts: 0,
+    lastRequestedAt: new Date(Date.now() - 120 * 1000),
+  };
+  await user.save();
+
+  const verifyRes = await fetch(`${baseUrl}/auth/verify-otp`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ phone: '9876543210', otp: '888888' }),
+  });
+
+  const verifyData = await verifyRes.json();
+  assert.strictEqual(verifyRes.status, 400);
+  assert.strictEqual(verifyData.success, false);
+  assert.match(verifyData.message, /expired/i);
+});
+
+test('OTP: Should invalidate OTP after exceeding 5 failed verification attempts', async () => {
+  // Set fresh OTP in user record
+  const user = await User.findOne({ phone: '+919876543210' });
+  user.otpInfo = {
+    code: '777777',
+    expiresAt: new Date(Date.now() + 10 * 60 * 1000),
+    attempts: 1,
+    verificationAttempts: 5, // Already 5 failed attempts
+    lastRequestedAt: new Date(Date.now() - 120 * 1000),
+  };
+  await user.save();
+
+  // 6th attempt should fail and invalidate OTP
+  const verifyRes = await fetch(`${baseUrl}/auth/verify-otp`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ phone: '9876543210', otp: '777777' }),
+  });
+
+  const verifyData = await verifyRes.json();
+  assert.strictEqual(verifyRes.status, 400);
+  assert.strictEqual(verifyData.success, false);
+  assert.match(verifyData.message, /too many failed verification attempts/i);
+
+  const updated = await User.findOne({ phone: '+919876543210' });
+  assert.strictEqual(updated.otpInfo?.code, undefined);
+});
+
+test('OTP: Should enforce cooldown rate limit on repeated OTP requests', async () => {
+  const user = await User.findOne({ phone: '+919876543210' });
+  user.otpInfo = {
+    code: '654321',
+    expiresAt: new Date(Date.now() + 10 * 60 * 1000),
+    attempts: 1,
+    verificationAttempts: 0,
+    lastRequestedAt: new Date(), // Just requested now (within 60s cooldown)
+  };
+  await user.save();
+
+  const sendRes = await fetch(`${baseUrl}/auth/send-otp`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ phone: '9876543210' }),
+  });
+
+  const sendData = await sendRes.json();
+  assert.strictEqual(sendRes.status, 429);
+  assert.strictEqual(sendData.success, false);
+  assert.match(sendData.message, /too many otp requests/i);
+});
+
 test('PROFILE & JWT: Should fetch profile with valid JWT bearer token', async () => {
-  // Login first to get token
   const loginRes = await fetch(`${baseUrl}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -246,7 +452,6 @@ test('PROFILE & JWT: Should fetch profile with valid JWT bearer token', async ()
   const loginData = await loginRes.json();
   const token = loginData.accessToken;
 
-  // Request Profile
   const profileRes = await fetch(`${baseUrl}/users/profile`, {
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -300,47 +505,7 @@ test('JWT CONFIG: Should throw clear error if JWT_SECRET environment variable is
   }
 });
 
-test('OTP: Should send and verify 6-digit OTP successfully, issuing real token', async () => {
-  // Request OTP
-  const sendRes = await fetch(`${baseUrl}/auth/send-otp`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ phone: '9876543210' }),
-  });
-
-  const sendData = await sendRes.json();
-  assert.strictEqual(sendRes.status, 200);
-  assert.ok(sendData.devOtp);
-  assert.strictEqual(sendData.devOtp.length, 6);
-
-  // Verify OTP
-  const verifyRes = await fetch(`${baseUrl}/auth/verify-otp`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ phone: '9876543210', otp: sendData.devOtp }),
-  });
-
-  const verifyData = await verifyRes.json();
-  assert.strictEqual(verifyRes.status, 200);
-  assert.strictEqual(verifyData.success, true);
-  assert.ok(verifyData.accessToken);
-  assert.strictEqual(verifyData.user.isVerified, true);
-});
-
-test('OTP: Should reject incorrect 6-digit OTP code', async () => {
-  const verifyRes = await fetch(`${baseUrl}/auth/verify-otp`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ phone: '9876543210', otp: '999999' }),
-  });
-
-  const verifyData = await verifyRes.json();
-  assert.strictEqual(verifyRes.status, 400);
-  assert.strictEqual(verifyData.success, false);
-});
-
 test('PASSWORD RESET: Should execute forgot password and reset password flow with strict policy', async () => {
-  // Forgot password
   const forgotRes = await fetch(`${baseUrl}/auth/forgot-password`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -349,14 +514,23 @@ test('PASSWORD RESET: Should execute forgot password and reset password flow wit
 
   const forgotData = await forgotRes.json();
   assert.strictEqual(forgotRes.status, 200);
-  assert.ok(forgotData.devResetToken);
+  assert.strictEqual(forgotData.devResetToken, undefined); // No raw token in response
+
+  // Retrieve hashed token from DB and simulate valid reset
+  const user = await User.findOne({ email: 'arjun.test@example.com' });
+  assert.ok(user.resetPasswordInfo && user.resetPasswordInfo.token);
+
+  // Generate a test reset token pair to test reset-password endpoint
+  const { rawToken, hashedToken, expiresAt } = passwordService.generateResetToken();
+  user.resetPasswordInfo = { token: hashedToken, expiresAt };
+  await user.save();
 
   // Attempt reset with weak password (missing special char)
   const weakResetRes = await fetch(`${baseUrl}/auth/reset-password`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      token: forgotData.devResetToken,
+      token: rawToken,
       newPassword: 'BrandNewPassword123',
     }),
   });
@@ -367,7 +541,7 @@ test('PASSWORD RESET: Should execute forgot password and reset password flow wit
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      token: forgotData.devResetToken,
+      token: rawToken,
       newPassword: 'BrandNewPassword123!',
     }),
   });

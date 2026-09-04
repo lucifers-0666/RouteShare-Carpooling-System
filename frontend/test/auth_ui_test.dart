@@ -86,13 +86,23 @@ class TestAuthNotifier extends AuthNotifier {
   }
 }
 
-Widget createTestApp(Widget child, {double width = 390, double height = 844}) {
+Widget createTestApp(
+  Widget child, {
+  double width = 390,
+  double height = 844,
+  double textScaleFactor = 1.0,
+  EdgeInsets viewInsets = EdgeInsets.zero,
+}) {
   return ProviderScope(
     overrides: [authProvider.overrideWith((ref) => TestAuthNotifier())],
     child: MaterialApp(
       theme: AppTheme.lightTheme,
       home: MediaQuery(
-        data: MediaQueryData(size: Size(width, height)),
+        data: MediaQueryData(
+          size: Size(width, height),
+          textScaler: TextScaler.linear(textScaleFactor),
+          viewInsets: viewInsets,
+        ),
         child: child,
       ),
     ),
@@ -102,8 +112,10 @@ Widget createTestApp(Widget child, {double width = 390, double height = 844}) {
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  const testWidths = [320.0, 360.0, 390.0, 412.0, 600.0];
+
   group('Responsive LoginScreen UI Tests', () {
-    for (final width in [320.0, 390.0, 600.0]) {
+    for (final width in testWidths) {
       testWidgets(
         'LoginScreen renders without overflow on width ${width.toInt()}dp',
         (tester) async {
@@ -142,6 +154,51 @@ void main() {
       );
     }
 
+    testWidgets(
+      'LoginScreen with 1.5x accessibility text scale renders cleanly',
+      (tester) async {
+        tester.view.physicalSize = const Size(390, 844);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(() {
+          tester.view.resetPhysicalSize();
+          tester.view.resetDevicePixelRatio();
+        });
+
+        await tester.pumpWidget(
+          createTestApp(const LoginScreen(), width: 390, textScaleFactor: 1.5),
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 100));
+
+        expect(find.text('Sign In'), findsWidgets);
+        expect(find.text('Password'), findsWidgets);
+      },
+    );
+
+    testWidgets(
+      'LoginScreen with keyboard visible maintains access without overflow',
+      (tester) async {
+        tester.view.physicalSize = const Size(390, 844);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(() {
+          tester.view.resetPhysicalSize();
+          tester.view.resetDevicePixelRatio();
+        });
+
+        await tester.pumpWidget(
+          createTestApp(
+            const LoginScreen(),
+            width: 390,
+            viewInsets: const EdgeInsets.only(bottom: 300),
+          ),
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 100));
+
+        expect(find.text('Sign In'), findsWidgets);
+      },
+    );
+
     testWidgets('AppTextField password visibility toggle functions correctly', (
       tester,
     ) async {
@@ -157,11 +214,8 @@ void main() {
 
       final toggleFinder = find.byType(IconButton);
       expect(toggleFinder, findsOneWidget);
-
-      // Verify eye icon exists
       expect(find.byIcon(Icons.visibility_outlined), findsOneWidget);
 
-      // Tap toggle to show password
       await tester.tap(toggleFinder);
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
@@ -171,7 +225,7 @@ void main() {
   });
 
   group('Responsive RegisterScreen UI Tests', () {
-    for (final width in [320.0, 390.0, 600.0]) {
+    for (final width in testWidths) {
       testWidgets(
         'RegisterScreen renders without overflow on width ${width.toInt()}dp',
         (tester) async {
@@ -196,6 +250,31 @@ void main() {
       );
     }
 
+    testWidgets(
+      'RegisterScreen with 1.5x accessibility text scale renders cleanly',
+      (tester) async {
+        tester.view.physicalSize = const Size(390, 844);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(() {
+          tester.view.resetPhysicalSize();
+          tester.view.resetDevicePixelRatio();
+        });
+
+        await tester.pumpWidget(
+          createTestApp(
+            const RegisterScreen(),
+            width: 390,
+            textScaleFactor: 1.5,
+          ),
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 100));
+
+        expect(find.text('Join Sahyān'), findsOneWidget);
+        expect(find.text('Register & Verify OTP'), findsOneWidget);
+      },
+    );
+
     testWidgets('RegisterScreen live password checklist updates on input', (
       tester,
     ) async {
@@ -204,21 +283,43 @@ void main() {
       await tester.pump(const Duration(milliseconds: 100));
 
       final passwordFields = find.byType(TextFormField);
-      // Field indices: 0: Name, 1: Email, 2: Phone, 3: Password, 4: Confirm
       final passwordInput = passwordFields.at(3);
 
-      // Enter full conforming password
       await tester.enterText(passwordInput, 'StrongPassword123!');
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
 
-      // Check for green check icons in policy items
       expect(find.byIcon(Icons.check_circle_rounded), findsWidgets);
+    });
+
+    testWidgets('RegisterScreen confirm password match indicator works', (
+      tester,
+    ) async {
+      await tester.pumpWidget(createTestApp(const RegisterScreen()));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+
+      final passwordFields = find.byType(TextFormField);
+      final passwordInput = passwordFields.at(3);
+      final confirmInput = passwordFields.at(4);
+
+      await tester.enterText(passwordInput, 'StrongPassword123!');
+      await tester.enterText(confirmInput, 'DifferentPassword123!');
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+
+      expect(find.text('Passwords do not match'), findsOneWidget);
+
+      await tester.enterText(confirmInput, 'StrongPassword123!');
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+
+      expect(find.text('Passwords match'), findsOneWidget);
     });
   });
 
   group('Responsive OtpScreen UI Tests', () {
-    for (final width in [320.0, 390.0, 600.0]) {
+    for (final width in testWidths) {
       testWidgets(
         'OtpScreen renders 6 digits without overflow on width ${width.toInt()}dp',
         (tester) async {
@@ -241,10 +342,55 @@ void main() {
         },
       );
     }
+
+    testWidgets(
+      'OtpScreen with 1.5x accessibility text scale renders cleanly',
+      (tester) async {
+        tester.view.physicalSize = const Size(390, 844);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(() {
+          tester.view.resetPhysicalSize();
+          tester.view.resetDevicePixelRatio();
+        });
+
+        await tester.pumpWidget(
+          createTestApp(const OtpScreen(), width: 390, textScaleFactor: 1.5),
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 100));
+
+        expect(find.text('Verify your phone'), findsOneWidget);
+        expect(find.text('Verify & Proceed'), findsOneWidget);
+      },
+    );
+
+    testWidgets('OtpScreen with keyboard visible maintains reachability', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      await tester.pumpWidget(
+        createTestApp(
+          const OtpScreen(),
+          width: 390,
+          viewInsets: const EdgeInsets.only(bottom: 300),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+
+      expect(find.text('Verify your phone'), findsOneWidget);
+      expect(find.text('Verify & Proceed'), findsOneWidget);
+    });
   });
 
   group('Responsive Forgot and Reset Password UI Tests', () {
-    for (final width in [320.0, 390.0]) {
+    for (final width in [320.0, 390.0, 600.0]) {
       testWidgets(
         'ForgotPasswordScreen and ResetPasswordScreen on width ${width.toInt()}dp',
         (tester) async {

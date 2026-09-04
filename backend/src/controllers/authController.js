@@ -35,7 +35,7 @@ const validatePasswordPolicy = (password) => {
   if (!/\d/.test(password)) {
     return 'Password must contain at least one number';
   }
-  if (!/[@$!%*?&#^()_\-+={}\[\]:;"'<>,.~`|\\]/.test(password)) {
+  if (!/[\W_]/.test(password)) {
     return 'Password must contain at least one special character';
   }
   return null;
@@ -103,7 +103,7 @@ const register = async (req, res, next) => {
       otpInfo: {
         code: otpCode,
         expiresAt: otpExpires,
-        attempts: 0,
+        attempts: 1,
         verificationAttempts: 0,
         lastRequestedAt: new Date(),
       },
@@ -115,7 +115,6 @@ const register = async (req, res, next) => {
       success: true,
       message: 'Registration successful. OTP sent for verification.',
       user: user.toJSON(),
-      devOtp: process.env.NODE_ENV !== 'production' ? otpCode : undefined,
     });
   } catch (error) {
     next(error);
@@ -154,6 +153,16 @@ const login = async (req, res, next) => {
     const isMatch = await user.matchPassword(password);
     if (!isMatch) {
       return res.status(401).json({ success: false, message: 'Invalid credentials' });
+    }
+
+    // Block unverified accounts from logging in via password
+    if (!user.isVerified) {
+      return res.status(403).json({
+        success: false,
+        message: 'Please verify your mobile number before logging in',
+        isVerified: false,
+        phone: user.phone,
+      });
     }
 
     const token = generateAccessToken(user._id);
@@ -196,16 +205,25 @@ const sendOtp = async (req, res, next) => {
     }
 
     if (otpService.isRateLimited(user.otpInfo)) {
-      return res.status(429).json({ success: false, message: 'Too many OTP requests. Please try again in a few minutes.' });
+      return res.status(429).json({ success: false, message: 'Too many OTP requests. Please wait before requesting a new code.' });
+    }
+
+    const now = new Date();
+    let currentAttempts = 1;
+    if (user.otpInfo && user.otpInfo.lastRequestedAt) {
+      const diffMins = (now - new Date(user.otpInfo.lastRequestedAt)) / (1000 * 60);
+      if (diffMins < 10) {
+        currentAttempts = (user.otpInfo.attempts || 0) + 1;
+      }
     }
 
     const otpCode = otpService.generateOtpCode(6);
     user.otpInfo = {
       code: otpCode,
       expiresAt: new Date(Date.now() + 10 * 60 * 1000),
-      attempts: (user.otpInfo?.attempts || 0) + 1,
+      attempts: currentAttempts,
       verificationAttempts: 0,
-      lastRequestedAt: new Date(),
+      lastRequestedAt: now,
     };
 
     await user.save();
@@ -214,7 +232,6 @@ const sendOtp = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       message: 'OTP sent successfully',
-      devOtp: process.env.NODE_ENV !== 'production' ? otpCode : undefined,
     });
   } catch (error) {
     next(error);
@@ -257,7 +274,7 @@ const verifyOtp = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'OTP has expired. Please request a new OTP.' });
     }
 
-    // Check verification attempts limit (max 5)
+    // Check verification attempts limit (max 5 failed attempts)
     user.otpInfo.verificationAttempts = (user.otpInfo.verificationAttempts || 0) + 1;
     if (user.otpInfo.verificationAttempts > 5) {
       user.otpInfo = undefined;
@@ -266,13 +283,13 @@ const verifyOtp = async (req, res, next) => {
     }
 
     const trimmedOtp = otp.toString().trim();
-    const isDevOtp = process.env.NODE_ENV !== 'production' && (trimmedOtp === '123456' || trimmedOtp === '000000');
-    if (!isDevOtp && user.otpInfo.code !== trimmedOtp) {
+    // Validate exclusively against the server-generated cryptographic OTP (no bypasses)
+    if (user.otpInfo.code !== trimmedOtp) {
       await user.save();
       return res.status(400).json({ success: false, message: 'Invalid OTP code' });
     }
 
-    // Verify user and clear OTP
+    // Mark user verified and clear OTP
     user.isVerified = true;
     user.otpInfo = undefined;
     await user.save();
@@ -314,12 +331,9 @@ const forgotPassword = async (req, res, next) => {
     user.resetPasswordInfo = { token: hashedToken, expiresAt };
     await user.save();
 
-    passwordService.logResetLink(user.email, rawToken);
-
     return res.status(200).json({
       success: true,
       message: 'If an account exists with this email, a reset token has been sent.',
-      devResetToken: process.env.NODE_ENV !== 'production' ? rawToken : undefined,
     });
   } catch (error) {
     next(error);

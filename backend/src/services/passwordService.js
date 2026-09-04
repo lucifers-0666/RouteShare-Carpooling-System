@@ -17,16 +17,6 @@ class PasswordService {
   hashToken(token) {
     return crypto.createHash('sha256').update(token).digest('hex');
   }
-
-  /**
-   * Log reset link in dev mode.
-   */
-  logResetLink(email, rawToken) {
-    console.log(`\n========================================`);
-    console.log(`[DEV EMAIL PROVIDER] Password reset request for ${email}`);
-    console.log(`[RESET TOKEN]: ${rawToken}`);
-    console.log(`========================================\n`);
-  }
 }
 
 module.exports = new PasswordService();

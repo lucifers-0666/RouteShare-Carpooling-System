@@ -65,10 +65,7 @@ class AuthRepositoryImpl implements AuthRepository {
       await storageService.saveUser(user);
     }
 
-    final result = <String, dynamic>{
-      'user': user,
-      'devOtp': response['devOtp'],
-    };
+    final result = <String, dynamic>{'user': user};
     if (token != null) {
       result['token'] = token;
     }

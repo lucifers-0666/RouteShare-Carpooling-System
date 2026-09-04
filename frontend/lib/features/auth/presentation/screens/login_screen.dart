@@ -22,13 +22,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   _LoginMethod _selectedMethod = _LoginMethod.password;
 
-  final TextEditingController _identifierController = TextEditingController(
-    text: '9876543210',
-  );
+  final TextEditingController _identifierController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _otpPhoneController = TextEditingController(
-    text: '9876543210',
-  );
+  final TextEditingController _otpPhoneController = TextEditingController();
 
   @override
   void dispose() {

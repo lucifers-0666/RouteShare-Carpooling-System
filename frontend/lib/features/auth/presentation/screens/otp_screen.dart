@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -29,14 +28,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     super.initState();
     _startTimer();
 
-    // Auto-fill devOtp strictly in debug mode for local testing
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (kDebugMode) {
-        final devOtp = ref.read(authProvider).devOtp;
-        if (devOtp != null && devOtp.isNotEmpty) {
-          _otpController.text = devOtp;
-        }
-      }
       _focusNode.requestFocus();
     });
   }
@@ -179,42 +171,6 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                   ),
                   const SizedBox(height: 28),
 
-                  // Non-production Dev OTP notice (Strictly debug mode only)
-                  if (kDebugMode && authState.devOtp != null)
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 24),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.softForest,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: AppColors.primaryForest.withValues(alpha: 0.3),
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.info_outline_rounded,
-                            size: 18,
-                            color: AppColors.primaryForest,
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Text(
-                              'Development Code: ${authState.devOtp}',
-                              style: AppTypography.caption.copyWith(
-                                color: AppColors.deepForest,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
                   // Responsive 6-digit OTP Box System
                   _buildResponsiveOtpBoxes(),
 
@@ -238,7 +194,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                           Text(
                             _canResend
                                 ? 'Code expired'
-                                : 'Resend code in 00:${_secondsRemaining.toString().padLeft(2, '0')}',
+                                : 'Resend in 00:${_secondsRemaining.toString().padLeft(2, '0')}',
                             style: AppTypography.caption.copyWith(
                               color: AppColors.textSecondary,
                             ),

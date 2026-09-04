@@ -12,7 +12,6 @@ class AuthState {
   final String? token;
   final String? errorMessage;
   final String? otpSentToPhone;
-  final String? devOtp;
 
   const AuthState({
     this.status = AuthStatus.initial,
@@ -20,7 +19,6 @@ class AuthState {
     this.token,
     this.errorMessage,
     this.otpSentToPhone,
-    this.devOtp,
   });
 
   bool get isAuthenticated => status == AuthStatus.authenticated;
@@ -32,7 +30,6 @@ class AuthState {
     String? token,
     String? errorMessage,
     String? otpSentToPhone,
-    String? devOtp,
   }) {
     return AuthState(
       status: status ?? this.status,
@@ -40,7 +37,6 @@ class AuthState {
       token: token ?? this.token,
       errorMessage: errorMessage,
       otpSentToPhone: otpSentToPhone ?? this.otpSentToPhone,
-      devOtp: devOtp ?? this.devOtp,
     );
   }
 }
@@ -147,13 +143,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
       );
 
       final user = result['user'] as UserModel;
-      final devOtp = result['devOtp'] as String?;
 
       state = state.copyWith(
         status: AuthStatus.unauthenticated,
         user: user,
         otpSentToPhone: phone,
-        devOtp: devOtp,
       );
       return true;
     } catch (e) {
@@ -168,11 +162,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<bool> sendOtp(String phone) async {
     state = state.copyWith(status: AuthStatus.loading, errorMessage: null);
     try {
-      final result = await repository.sendOtp(phone);
+      await repository.sendOtp(phone);
       state = state.copyWith(
         status: AuthStatus.unauthenticated,
         otpSentToPhone: phone,
-        devOtp: result['devOtp'] as String?,
       );
       return true;
     } catch (e) {

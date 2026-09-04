@@ -83,21 +83,18 @@ class MockAuthRepository implements AuthRepository {
       rating: 5.0,
       totalRides: 0,
     );
-    return {'user': user, 'devOtp': '123456'};
+    return {'user': user};
   }
 
   @override
-  Future<Map<String, dynamic>> sendOtp(String phone) async => {
-    'success': true,
-    'devOtp': '123456',
-  };
+  Future<Map<String, dynamic>> sendOtp(String phone) async => {'success': true};
 
   @override
   Future<Map<String, dynamic>> verifyOtp({
     required String phone,
     required String otp,
   }) async {
-    if (otp != '123456') throw Exception('Invalid OTP');
+    if (otp != '654321') throw Exception('Invalid OTP');
     final user = UserModel(
       id: 'usr_123',
       name: 'Arjun Patel',
@@ -219,7 +216,6 @@ void main() {
 
       expect(result, isTrue);
       expect(notifier.state.status, AuthStatus.unauthenticated);
-      expect(notifier.state.devOtp, '123456');
       expect(notifier.state.otpSentToPhone, '9998887776');
     },
   );
@@ -236,7 +232,7 @@ void main() {
       await notifier.sendOtp('9998887776');
       expect(notifier.state.otpSentToPhone, '9998887776');
 
-      final verifySuccess = await notifier.verifyOtp('123456');
+      final verifySuccess = await notifier.verifyOtp('654321');
       expect(verifySuccess, isTrue);
       expect(notifier.state.status, AuthStatus.authenticated);
       expect(notifier.state.token, 'jwt_token_123');
