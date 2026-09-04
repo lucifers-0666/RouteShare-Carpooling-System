@@ -58,8 +58,16 @@ class BookingConfirmationScreen extends ConsumerWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('Booking Reference', style: AppTypography.caption),
-                            Text(booking.id.substring(0, 10), style: AppTypography.caption.copyWith(fontWeight: FontWeight.bold)),
+                            Text(
+                              'Booking Reference',
+                              style: AppTypography.caption,
+                            ),
+                            Text(
+                              booking.id.substring(0, 10),
+                              style: AppTypography.caption.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ],
                         ),
                         const Divider(color: AppColors.border, height: 20),
@@ -69,7 +77,9 @@ class BookingConfirmationScreen extends ConsumerWidget {
                             Text('Route', style: AppTypography.bodyMedium),
                             Text(
                               '${booking.rideDetails?.origin.city} → ${booking.rideDetails?.destination.city}',
-                              style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.bold),
+                              style: AppTypography.bodyMedium.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ],
                         ),
@@ -77,8 +87,16 @@ class BookingConfirmationScreen extends ConsumerWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('Selected Seats', style: AppTypography.secondary),
-                            Text(booking.selectedSeats.join(', '), style: AppTypography.secondary.copyWith(fontWeight: FontWeight.bold)),
+                            Text(
+                              'Selected Seats',
+                              style: AppTypography.secondary,
+                            ),
+                            Text(
+                              booking.selectedSeats.join(', '),
+                              style: AppTypography.secondary.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ],
                         ),
                         const SizedBox(height: 6),
@@ -87,12 +105,21 @@ class BookingConfirmationScreen extends ConsumerWidget {
                           children: [
                             Text('Status', style: AppTypography.secondary),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
                               decoration: BoxDecoration(
                                 color: AppColors.softBrass,
                                 borderRadius: BorderRadius.circular(4),
                               ),
-                              child: Text('Pending Driver Approval', style: AppTypography.caption.copyWith(color: AppColors.mutedBrass, fontWeight: FontWeight.bold)),
+                              child: Text(
+                                'Pending Driver Approval',
+                                style: AppTypography.caption.copyWith(
+                                  color: AppColors.mutedBrass,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
                           ],
                         ),

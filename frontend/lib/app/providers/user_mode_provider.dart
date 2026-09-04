@@ -1,14 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-enum AccessMode {
-  authenticated,
-  guest,
-}
+enum AccessMode { authenticated, guest }
 
-enum OperationalMode {
-  rider,
-  driver,
-}
+enum OperationalMode { rider, driver }
 
 class UserModeState {
   final AccessMode accessMode;
@@ -66,6 +60,8 @@ class UserModeNotifier extends StateNotifier<UserModeState> {
   }
 }
 
-final userModeProvider = StateNotifierProvider<UserModeNotifier, UserModeState>((ref) {
-  return UserModeNotifier();
-});
+final userModeProvider = StateNotifierProvider<UserModeNotifier, UserModeState>(
+  (ref) {
+    return UserModeNotifier();
+  },
+);

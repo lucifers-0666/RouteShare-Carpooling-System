@@ -2,12 +2,15 @@ const crypto = require('crypto');
 
 class OtpService {
   /**
-   * Generates a 4-digit or 6-digit numeric OTP code.
+   * Generates a 6-digit cryptographically secure numeric OTP code.
    */
-  generateOtpCode(length = 4) {
+  generateOtpCode(length = 6) {
+    if (length === 6) {
+      return crypto.randomInt(100000, 1000000).toString();
+    }
     const min = Math.pow(10, length - 1);
     const max = Math.pow(10, length) - 1;
-    return Math.floor(min + Math.random() * (max - min + 1)).toString();
+    return crypto.randomInt(min, max + 1).toString();
   }
 
   /**

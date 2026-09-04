@@ -18,14 +18,17 @@ class AuthDecisionScreen extends ConsumerWidget {
           builder: (context, constraints) {
             return Center(
               child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 500),
+                constraints: const BoxConstraints(maxWidth: 480),
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 28.0, vertical: 24.0),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 28.0,
+                    vertical: 24.0,
+                  ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 16),
 
                       // Brand Icon
                       Center(
@@ -37,7 +40,9 @@ class AuthDecisionScreen extends ConsumerWidget {
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.primaryForest.withValues(alpha: 0.25),
+                                color: AppColors.primaryForest.withValues(
+                                  alpha: 0.22,
+                                ),
                                 blurRadius: 20,
                                 offset: const Offset(0, 8),
                               ),
@@ -45,7 +50,7 @@ class AuthDecisionScreen extends ConsumerWidget {
                           ),
                           child: const Icon(
                             Icons.directions_car_rounded,
-                            size: 44,
+                            size: 42,
                             color: AppColors.white,
                           ),
                         ),
@@ -58,17 +63,21 @@ class AuthDecisionScreen extends ConsumerWidget {
                         style: AppTypography.screenTitle.copyWith(
                           fontSize: 32,
                           color: AppColors.deepForest,
-                          letterSpacing: 1.0,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.8,
                         ),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 8),
 
+                      // Chosen Tagline
                       Text(
-                        'Intelligent Route-Based Carpooling Platform',
-                        style: AppTypography.secondary.copyWith(
+                        'Where Journeys Find Company.',
+                        style: AppTypography.bodyMedium.copyWith(
                           color: AppColors.textSecondary,
-                          fontSize: 14,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: 0.2,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -80,19 +89,30 @@ class AuthDecisionScreen extends ConsumerWidget {
                         spacing: 8,
                         runSpacing: 8,
                         children: const [
-                          _FeaturePill(icon: Icons.verified_user_outlined, label: 'Verified Profiles'),
-                          _FeaturePill(icon: Icons.shield_outlined, label: 'Escrow Protection'),
-                          _FeaturePill(icon: Icons.alt_route_rounded, label: 'Direct Highway Routes'),
+                          _FeaturePill(
+                            icon: Icons.verified_user_outlined,
+                            label: 'Verified Profiles',
+                          ),
+                          _FeaturePill(
+                            icon: Icons.shield_outlined,
+                            label: 'Escrow Protection',
+                          ),
+                          _FeaturePill(
+                            icon: Icons.alt_route_rounded,
+                            label: 'Direct Highway Routes',
+                          ),
                         ],
                       ),
-                      const SizedBox(height: 48),
+                      const SizedBox(height: 44),
 
                       // Primary Action: Sign Up
                       PrimaryButton(
                         text: 'Create an Account',
                         icon: Icons.person_add_outlined,
                         onPressed: () {
-                          ref.read(userModeProvider.notifier).setAuthenticatedMode();
+                          ref
+                              .read(userModeProvider.notifier)
+                              .setAuthenticatedMode();
                           context.push('/register');
                         },
                       ),
@@ -101,14 +121,21 @@ class AuthDecisionScreen extends ConsumerWidget {
                       // Secondary Action: Log In
                       OutlinedButton.icon(
                         style: OutlinedButton.styleFrom(
-                          minimumSize: const Size.fromHeight(52),
-                          side: const BorderSide(color: AppColors.border, width: 1.5),
+                          minimumSize: const Size.fromHeight(50),
+                          side: const BorderSide(
+                            color: AppColors.border,
+                            width: 1.2,
+                          ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
                           backgroundColor: AppColors.white,
                         ),
-                        icon: const Icon(Icons.login_rounded, color: AppColors.primaryForest, size: 20),
+                        icon: const Icon(
+                          Icons.login_rounded,
+                          color: AppColors.primaryForest,
+                          size: 20,
+                        ),
                         label: Text(
                           'Log In',
                           style: AppTypography.button.copyWith(
@@ -117,7 +144,9 @@ class AuthDecisionScreen extends ConsumerWidget {
                           ),
                         ),
                         onPressed: () {
-                          ref.read(userModeProvider.notifier).setAuthenticatedMode();
+                          ref
+                              .read(userModeProvider.notifier)
+                              .setAuthenticatedMode();
                           context.push('/login');
                         },
                       ),
@@ -126,9 +155,13 @@ class AuthDecisionScreen extends ConsumerWidget {
                       // Divider with Text
                       Row(
                         children: [
-                          const Expanded(child: Divider(color: AppColors.border)),
+                          const Expanded(
+                            child: Divider(color: AppColors.border),
+                          ),
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14.0,
+                            ),
                             child: Text(
                               'OR',
                               style: AppTypography.caption.copyWith(
@@ -137,23 +170,33 @@ class AuthDecisionScreen extends ConsumerWidget {
                               ),
                             ),
                           ),
-                          const Expanded(child: Divider(color: AppColors.border)),
+                          const Expanded(
+                            child: Divider(color: AppColors.border),
+                          ),
                         ],
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 16),
 
-                      // Tertiary Action: Explore as Guest
+                      // Tertiary Action: Explore as Guest (Without Underline)
                       TextButton.icon(
                         style: TextButton.styleFrom(
                           minimumSize: const Size.fromHeight(48),
                           padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
-                        icon: const Icon(Icons.explore_outlined, color: AppColors.primaryForest, size: 20),
+                        icon: const Icon(
+                          Icons.explore_outlined,
+                          color: AppColors.primaryForest,
+                          size: 20,
+                        ),
                         label: Text(
                           'Explore as Guest',
-                          style: AppTypography.button.copyWith(
+                          style: AppTypography.bodyMedium.copyWith(
                             color: AppColors.primaryForest,
-                            decoration: TextDecoration.underline,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15,
                           ),
                         ),
                         onPressed: () {
@@ -161,17 +204,18 @@ class AuthDecisionScreen extends ConsumerWidget {
                           context.go('/home');
                         },
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 4),
 
                       Text(
-                        'Browse active routes & trip contribution costs without signing in.',
+                        'Browse active routes and trip contribution costs without signing in.',
                         style: AppTypography.caption.copyWith(
                           color: AppColors.textSecondary,
                           fontSize: 12,
+                          height: 1.3,
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 16),
                     ],
                   ),
                 ),
@@ -188,10 +232,7 @@ class _FeaturePill extends StatelessWidget {
   final IconData icon;
   final String label;
 
-  const _FeaturePill({
-    required this.icon,
-    required this.label,
-  });
+  const _FeaturePill({required this.icon, required this.label});
 
   @override
   Widget build(BuildContext context) {

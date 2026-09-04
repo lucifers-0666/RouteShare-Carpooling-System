@@ -147,7 +147,9 @@ class MockRidesRepository implements RidesRepository {
     required DateTime date,
     required int seats,
   }) async {
-    await Future.delayed(const Duration(milliseconds: 600)); // Simulate network latency
+    await Future.delayed(
+      const Duration(milliseconds: 600),
+    ); // Simulate network latency
     return _mockRides;
   }
 

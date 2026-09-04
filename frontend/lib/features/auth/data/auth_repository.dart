@@ -36,10 +36,7 @@ class AuthRepositoryImpl implements AuthRepository {
   final ApiClient apiClient;
   final SecureStorageService storageService;
 
-  AuthRepositoryImpl({
-    required this.apiClient,
-    required this.storageService,
-  });
+  AuthRepositoryImpl({required this.apiClient, required this.storageService});
 
   @override
   Future<Map<String, dynamic>> register({
@@ -49,25 +46,33 @@ class AuthRepositoryImpl implements AuthRepository {
     required String password,
   }) async {
     final cleanPhone = phone.length == 10 ? '+91$phone' : phone;
-    final response = await apiClient.post('/auth/register', body: {
-      'name': name,
-      'email': email,
-      'phone': cleanPhone,
-      'password': password,
-    });
+    final response = await apiClient.post(
+      '/auth/register',
+      body: {
+        'name': name,
+        'email': email,
+        'phone': cleanPhone,
+        'password': password,
+      },
+    );
 
-    final token = response['accessToken'] as String;
+    final token = response['accessToken'] as String?;
     final user = UserModel.fromJson(response['user']);
 
-    apiClient.setAuthToken(token);
-    await storageService.saveToken(token);
-    await storageService.saveUser(user);
+    if (token != null) {
+      apiClient.setAuthToken(token);
+      await storageService.saveToken(token);
+      await storageService.saveUser(user);
+    }
 
-    return {
-      'token': token,
+    final result = <String, dynamic>{
       'user': user,
       'devOtp': response['devOtp'],
     };
+    if (token != null) {
+      result['token'] = token;
+    }
+    return result;
   }
 
   @override
@@ -75,10 +80,10 @@ class AuthRepositoryImpl implements AuthRepository {
     required String identifier,
     required String password,
   }) async {
-    final response = await apiClient.post('/auth/login', body: {
-      'identifier': identifier,
-      'password': password,
-    });
+    final response = await apiClient.post(
+      '/auth/login',
+      body: {'identifier': identifier, 'password': password},
+    );
 
     final token = response['accessToken'] as String;
     final user = UserModel.fromJson(response['user']);
@@ -100,10 +105,10 @@ class AuthRepositoryImpl implements AuthRepository {
     required String phone,
     required String otp,
   }) async {
-    final response = await apiClient.post('/auth/verify-otp', body: {
-      'phone': phone,
-      'otp': otp,
-    });
+    final response = await apiClient.post(
+      '/auth/verify-otp',
+      body: {'phone': phone, 'otp': otp},
+    );
 
     final token = response['accessToken'] as String;
     final user = UserModel.fromJson(response['user']);
@@ -117,7 +122,10 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<Map<String, dynamic>> forgotPassword(String email) async {
-    return await apiClient.post('/auth/forgot-password', body: {'email': email});
+    return await apiClient.post(
+      '/auth/forgot-password',
+      body: {'email': email},
+    );
   }
 
   @override
@@ -125,10 +133,10 @@ class AuthRepositoryImpl implements AuthRepository {
     required String token,
     required String newPassword,
   }) async {
-    return await apiClient.post('/auth/reset-password', body: {
-      'token': token,
-      'password': newPassword,
-    });
+    return await apiClient.post(
+      '/auth/reset-password',
+      body: {'token': token, 'password': newPassword},
+    );
   }
 
   @override

@@ -26,7 +26,9 @@ class SearchResultsScreen extends ConsumerWidget {
           children: [
             Text(
               '${query.origin} → ${query.destination}',
-              style: AppTypography.sectionHeader.copyWith(fontWeight: FontWeight.bold),
+              style: AppTypography.sectionHeader.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
             ),
             Text(
               'Today • ${query.seats} Seat(s)',
@@ -36,7 +38,10 @@ class SearchResultsScreen extends ConsumerWidget {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.tune_rounded, color: AppColors.primaryForest),
+            icon: const Icon(
+              Icons.tune_rounded,
+              color: AppColors.primaryForest,
+            ),
             onPressed: () {},
           ),
         ],
@@ -48,11 +53,21 @@ class SearchResultsScreen extends ConsumerWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.no_drinks_rounded, size: 64, color: AppColors.textSecondary),
+                  const Icon(
+                    Icons.no_drinks_rounded,
+                    size: 64,
+                    color: AppColors.textSecondary,
+                  ),
                   const SizedBox(height: 16),
-                  Text('No matching rides found', style: AppTypography.sectionHeader),
+                  Text(
+                    'No matching rides found',
+                    style: AppTypography.sectionHeader,
+                  ),
                   const SizedBox(height: 8),
-                  Text('Try adjusting your route or timing filter', style: AppTypography.secondary),
+                  Text(
+                    'Try adjusting your route or timing filter',
+                    style: AppTypography.secondary,
+                  ),
                 ],
               ),
             );
@@ -77,7 +92,10 @@ class SearchResultsScreen extends ConsumerWidget {
           child: CircularProgressIndicator(color: AppColors.primaryForest),
         ),
         error: (err, stack) => Center(
-          child: Text('Error loading rides: $err', style: AppTypography.bodyMedium),
+          child: Text(
+            'Error loading rides: $err',
+            style: AppTypography.bodyMedium,
+          ),
         ),
       ),
     );

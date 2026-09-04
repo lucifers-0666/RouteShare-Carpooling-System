@@ -24,11 +24,21 @@ class MyBookingsScreen extends ConsumerWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.confirmation_number_outlined, size: 64, color: AppColors.textSecondary),
+                  const Icon(
+                    Icons.confirmation_number_outlined,
+                    size: 64,
+                    color: AppColors.textSecondary,
+                  ),
                   const SizedBox(height: 16),
-                  Text('No active bookings', style: AppTypography.sectionHeader),
+                  Text(
+                    'No active bookings',
+                    style: AppTypography.sectionHeader,
+                  ),
                   const SizedBox(height: 8),
-                  Text('Your confirmed & pending ride bookings will appear here', style: AppTypography.secondary),
+                  Text(
+                    'Your confirmed & pending ride bookings will appear here',
+                    style: AppTypography.secondary,
+                  ),
                 ],
               ),
             );
@@ -51,14 +61,20 @@ class MyBookingsScreen extends ConsumerWidget {
                         children: [
                           Flexible(
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 3,
+                              ),
                               decoration: BoxDecoration(
                                 color: AppColors.softBrass,
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
                                 'Pending Driver Approval',
-                                style: AppTypography.caption.copyWith(color: AppColors.mutedBrass, fontWeight: FontWeight.bold),
+                                style: AppTypography.caption.copyWith(
+                                  color: AppColors.mutedBrass,
+                                  fontWeight: FontWeight.bold,
+                                ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -67,18 +83,28 @@ class MyBookingsScreen extends ConsumerWidget {
                           const SizedBox(width: 8),
                           Text(
                             '₹${booking.totalAmount.toStringAsFixed(0)}',
-                            style: AppTypography.sectionHeader.copyWith(color: AppColors.primaryForest),
+                            style: AppTypography.sectionHeader.copyWith(
+                              color: AppColors.primaryForest,
+                            ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 12),
                       Text(
                         '${booking.rideDetails?.origin.city} → ${booking.rideDetails?.destination.city}',
-                        style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold),
+                        style: AppTypography.bodyLarge.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 4),
-                      Text('Driver: ${booking.rideDetails?.driverName}', style: AppTypography.secondary),
-                      Text('Seats: ${booking.selectedSeats.join(', ')}', style: AppTypography.secondary),
+                      Text(
+                        'Driver: ${booking.rideDetails?.driverName}',
+                        style: AppTypography.secondary,
+                      ),
+                      Text(
+                        'Seats: ${booking.selectedSeats.join(', ')}',
+                        style: AppTypography.secondary,
+                      ),
                     ],
                   ),
                 ),
@@ -86,7 +112,9 @@ class MyBookingsScreen extends ConsumerWidget {
             },
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primaryForest)),
+        loading: () => const Center(
+          child: CircularProgressIndicator(color: AppColors.primaryForest),
+        ),
         error: (err, stack) => Center(child: Text('Error: $err')),
       ),
     );

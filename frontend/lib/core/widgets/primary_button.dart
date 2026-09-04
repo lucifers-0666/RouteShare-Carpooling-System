@@ -25,13 +25,13 @@ class PrimaryButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: effectiveOnPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: isDisabled ? AppColors.mutedSage.withValues(alpha: 0.4) : AppColors.primaryForest,
+        backgroundColor: isDisabled
+            ? AppColors.mutedSage.withValues(alpha: 0.4)
+            : AppColors.primaryForest,
         foregroundColor: AppColors.white,
         elevation: 0,
         minimumSize: const Size(double.infinity, 50),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
       child: isLoading
           ? const SizedBox(
@@ -44,14 +44,20 @@ class PrimaryButton extends StatelessWidget {
             )
           : Row(
               mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 if (icon != null) ...[
                   Icon(icon, size: 20, color: AppColors.white),
                   const SizedBox(width: 8),
                 ],
-                Text(
-                  text,
-                  style: AppTypography.button,
+                Flexible(
+                  child: Text(
+                    text,
+                    style: AppTypography.button,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ],
             ),

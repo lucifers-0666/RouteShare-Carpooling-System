@@ -24,10 +24,7 @@ final appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
   initialLocation: '/',
   routes: [
-    GoRoute(
-      path: '/',
-      builder: (context, state) => const SplashScreen(),
-    ),
+    GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
     GoRoute(
       path: '/onboarding',
       builder: (context, state) => const OnboardingScreen(),
@@ -36,10 +33,7 @@ final appRouter = GoRouter(
       path: '/auth-entry',
       builder: (context, state) => const AuthDecisionScreen(),
     ),
-    GoRoute(
-      path: '/login',
-      builder: (context, state) => const LoginScreen(),
-    ),
+    GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
     GoRoute(
       path: '/register',
       builder: (context, state) => const RegisterScreen(),
@@ -55,10 +49,7 @@ final appRouter = GoRouter(
         return ResetPasswordScreen(initialToken: token);
       },
     ),
-    GoRoute(
-      path: '/otp',
-      builder: (context, state) => const OtpScreen(),
-    ),
+    GoRoute(path: '/otp', builder: (context, state) => const OtpScreen()),
     GoRoute(
       path: '/search-results',
       builder: (context, state) => const SearchResultsScreen(),

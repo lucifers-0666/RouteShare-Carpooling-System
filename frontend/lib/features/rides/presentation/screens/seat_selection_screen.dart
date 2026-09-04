@@ -44,14 +44,26 @@ class SeatSelectionScreen extends ConsumerWidget {
                 padding: const EdgeInsets.all(16.0),
                 child: Row(
                   children: [
-                    const Icon(Icons.airline_seat_recline_extra_rounded, color: AppColors.primaryForest, size: 28),
+                    const Icon(
+                      Icons.airline_seat_recline_extra_rounded,
+                      color: AppColors.primaryForest,
+                      size: 28,
+                    ),
                     const SizedBox(width: 14),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(ride.vehicle.fullName, style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold)),
-                          Text('Available Seats: ${ride.availableSeats} of ${ride.totalSeats}', style: AppTypography.secondary),
+                          Text(
+                            ride.vehicle.fullName,
+                            style: AppTypography.bodyLarge.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            'Available Seats: ${ride.availableSeats} of ${ride.totalSeats}',
+                            style: AppTypography.secondary,
+                          ),
                         ],
                       ),
                     ),
@@ -81,9 +93,21 @@ class SeatSelectionScreen extends ConsumerWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    _buildLegendItem(AppColors.warmBackground, AppColors.border, 'Available'),
-                    _buildLegendItem(AppColors.softForest, AppColors.primaryForest, 'Selected'),
-                    _buildLegendItem(AppColors.border.withValues(alpha: 0.4), AppColors.border, 'Occupied'),
+                    _buildLegendItem(
+                      AppColors.warmBackground,
+                      AppColors.border,
+                      'Available',
+                    ),
+                    _buildLegendItem(
+                      AppColors.softForest,
+                      AppColors.primaryForest,
+                      'Selected',
+                    ),
+                    _buildLegendItem(
+                      AppColors.border.withValues(alpha: 0.4),
+                      AppColors.border,
+                      'Occupied',
+                    ),
                   ],
                 ),
               ),
@@ -103,10 +127,15 @@ class SeatSelectionScreen extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Total (${selectedSeats.length} seat)', style: AppTypography.caption),
+                Text(
+                  'Total (${selectedSeats.length} seat)',
+                  style: AppTypography.caption,
+                ),
                 Text(
                   '₹${totalAmount.toStringAsFixed(0)}',
-                  style: AppTypography.screenTitle.copyWith(color: AppColors.primaryForest),
+                  style: AppTypography.screenTitle.copyWith(
+                    color: AppColors.primaryForest,
+                  ),
                 ),
               ],
             ),

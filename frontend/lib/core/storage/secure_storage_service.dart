@@ -10,10 +10,13 @@ class SecureStorageService {
   static const String _keyOnboardingCompleted = 'sahyan_onboarding_completed';
 
   SecureStorageService({FlutterSecureStorage? storage})
-      : _storage = storage ?? const FlutterSecureStorage();
+    : _storage = storage ?? const FlutterSecureStorage();
 
   Future<void> setCompletedOnboarding(bool completed) async {
-    await _storage.write(key: _keyOnboardingCompleted, value: completed ? 'true' : 'false');
+    await _storage.write(
+      key: _keyOnboardingCompleted,
+      value: completed ? 'true' : 'false',
+    );
   }
 
   Future<bool> hasCompletedOnboarding() async {

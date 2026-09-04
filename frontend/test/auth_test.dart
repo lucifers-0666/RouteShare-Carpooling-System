@@ -36,7 +36,8 @@ class MockSecureStorageService implements SecureStorageService {
   bool _completedOnboarding = false;
 
   @override
-  Future<void> setCompletedOnboarding(bool completed) async => _completedOnboarding = completed;
+  Future<void> setCompletedOnboarding(bool completed) async =>
+      _completedOnboarding = completed;
 
   @override
   Future<bool> hasCompletedOnboarding() async => _completedOnboarding;
@@ -46,7 +47,10 @@ class MockAuthRepository implements AuthRepository {
   bool shouldFail = false;
 
   @override
-  Future<Map<String, dynamic>> login({required String identifier, required String password}) async {
+  Future<Map<String, dynamic>> login({
+    required String identifier,
+    required String password,
+  }) async {
     if (shouldFail) throw Exception('Invalid credentials');
     final user = UserModel(
       id: 'usr_123',
@@ -79,15 +83,21 @@ class MockAuthRepository implements AuthRepository {
       rating: 5.0,
       totalRides: 0,
     );
-    return {'token': 'jwt_token_456', 'user': user, 'devOtp': '1234'};
+    return {'user': user, 'devOtp': '123456'};
   }
 
   @override
-  Future<Map<String, dynamic>> sendOtp(String phone) async => {'success': true, 'devOtp': '1234'};
+  Future<Map<String, dynamic>> sendOtp(String phone) async => {
+    'success': true,
+    'devOtp': '123456',
+  };
 
   @override
-  Future<Map<String, dynamic>> verifyOtp({required String phone, required String otp}) async {
-    if (otp != '1234') throw Exception('Invalid OTP');
+  Future<Map<String, dynamic>> verifyOtp({
+    required String phone,
+    required String otp,
+  }) async {
+    if (otp != '123456') throw Exception('Invalid OTP');
     final user = UserModel(
       id: 'usr_123',
       name: 'Arjun Patel',
@@ -102,10 +112,15 @@ class MockAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<Map<String, dynamic>> forgotPassword(String email) async => {'success': true};
+  Future<Map<String, dynamic>> forgotPassword(String email) async => {
+    'success': true,
+  };
 
   @override
-  Future<Map<String, dynamic>> resetPassword({required String token, required String newPassword}) async => {'success': true};
+  Future<Map<String, dynamic>> resetPassword({
+    required String token,
+    required String newPassword,
+  }) async => {'success': true};
 
   @override
   Future<UserModel> getProfile() async {
@@ -144,7 +159,10 @@ void main() {
     );
 
     await Future.delayed(Duration.zero);
-    expect(notifier.state.status, anyOf(AuthStatus.initial, AuthStatus.loading, AuthStatus.unauthenticated));
+    expect(
+      notifier.state.status,
+      anyOf(AuthStatus.initial, AuthStatus.loading, AuthStatus.unauthenticated),
+    );
   });
 
   test('Login success updates AuthNotifier state to authenticated', () async {
@@ -154,7 +172,10 @@ void main() {
       apiClient: apiClient,
     );
 
-    final result = await notifier.login(identifier: 'arjun@example.com', password: 'Password123');
+    final result = await notifier.login(
+      identifier: 'arjun@example.com',
+      password: 'StrongPassword123!',
+    );
 
     expect(result, isTrue);
     expect(notifier.state.status, AuthStatus.authenticated);
@@ -170,30 +191,70 @@ void main() {
       apiClient: apiClient,
     );
 
-    final result = await notifier.login(identifier: 'arjun@example.com', password: 'wrong');
+    final result = await notifier.login(
+      identifier: 'arjun@example.com',
+      password: 'wrong',
+    );
 
     expect(result, isFalse);
     expect(notifier.state.status, AuthStatus.error);
     expect(notifier.state.errorMessage, contains('Invalid credentials'));
   });
 
-  test('Registration success updates state with user and devOtp', () async {
+  test(
+    'Registration leaves state unauthenticated pending 6-digit OTP verification',
+    () async {
+      final notifier = AuthNotifier(
+        repository: mockRepo,
+        storageService: storageService,
+        apiClient: apiClient,
+      );
+
+      final result = await notifier.register(
+        name: 'New User',
+        email: 'new@example.com',
+        phone: '9998887776',
+        password: 'StrongPassword123!',
+      );
+
+      expect(result, isTrue);
+      expect(notifier.state.status, AuthStatus.unauthenticated);
+      expect(notifier.state.devOtp, '123456');
+      expect(notifier.state.otpSentToPhone, '9998887776');
+    },
+  );
+
+  test(
+    'Verify OTP with 6-digit code transitions state to authenticated with real token',
+    () async {
+      final notifier = AuthNotifier(
+        repository: mockRepo,
+        storageService: storageService,
+        apiClient: apiClient,
+      );
+
+      await notifier.sendOtp('9998887776');
+      expect(notifier.state.otpSentToPhone, '9998887776');
+
+      final verifySuccess = await notifier.verifyOtp('123456');
+      expect(verifySuccess, isTrue);
+      expect(notifier.state.status, AuthStatus.authenticated);
+      expect(notifier.state.token, 'jwt_token_123');
+      expect(notifier.state.user?.name, 'Arjun Patel');
+    },
+  );
+
+  test('Verify OTP with invalid code fails and sets error status', () async {
     final notifier = AuthNotifier(
       repository: mockRepo,
       storageService: storageService,
       apiClient: apiClient,
     );
 
-    final result = await notifier.register(
-      name: 'New User',
-      email: 'new@example.com',
-      phone: '9998887776',
-      password: 'Password123',
-    );
-
-    expect(result, isTrue);
-    expect(notifier.state.status, AuthStatus.authenticated);
-    expect(notifier.state.devOtp, '1234');
+    await notifier.sendOtp('9998887776');
+    final verifySuccess = await notifier.verifyOtp('000000');
+    expect(verifySuccess, isFalse);
+    expect(notifier.state.status, AuthStatus.error);
   });
 
   test('Logout clears authentication state', () async {
@@ -203,7 +264,10 @@ void main() {
       apiClient: apiClient,
     );
 
-    await notifier.login(identifier: 'arjun@example.com', password: 'Password123');
+    await notifier.login(
+      identifier: 'arjun@example.com',
+      password: 'StrongPassword123!',
+    );
     expect(notifier.state.status, AuthStatus.authenticated);
 
     await notifier.logout();
@@ -212,36 +276,41 @@ void main() {
     expect(notifier.state.token, isNull);
   });
 
-  test('Session restoration restores authenticated state when valid token in storage', () async {
-    await storageService.saveToken('valid_stored_jwt_token');
-    
-    final notifier = AuthNotifier(
-      repository: mockRepo,
-      storageService: storageService,
-      apiClient: apiClient,
-    );
+  test(
+    'Session restoration restores authenticated state when valid token in storage',
+    () async {
+      await storageService.saveToken('valid_stored_jwt_token');
 
-    // Wait for checkAuthStatus async execution
-    await Future.delayed(const Duration(milliseconds: 50));
+      final notifier = AuthNotifier(
+        repository: mockRepo,
+        storageService: storageService,
+        apiClient: apiClient,
+      );
 
-    expect(notifier.state.status, AuthStatus.authenticated);
-    expect(notifier.state.token, 'valid_stored_jwt_token');
-    expect(notifier.state.user?.name, 'Arjun Patel');
-  });
+      await Future.delayed(const Duration(milliseconds: 50));
 
-  test('Session restoration clears session and unauthenticates on 401 response', () async {
-    await storageService.saveToken('expired_jwt_token');
-    mockRepo.shouldFail = true;
+      expect(notifier.state.status, AuthStatus.authenticated);
+      expect(notifier.state.token, 'valid_stored_jwt_token');
+      expect(notifier.state.user?.name, 'Arjun Patel');
+    },
+  );
 
-    final notifier = AuthNotifier(
-      repository: mockRepo,
-      storageService: storageService,
-      apiClient: apiClient,
-    );
+  test(
+    'Session restoration clears session and unauthenticates on 401 response',
+    () async {
+      await storageService.saveToken('expired_jwt_token');
+      mockRepo.shouldFail = true;
 
-    await Future.delayed(const Duration(milliseconds: 50));
+      final notifier = AuthNotifier(
+        repository: mockRepo,
+        storageService: storageService,
+        apiClient: apiClient,
+      );
 
-    expect(notifier.state.status, AuthStatus.unauthenticated);
-    expect(notifier.state.user, isNull);
-  });
+      await Future.delayed(const Duration(milliseconds: 50));
+
+      expect(notifier.state.status, AuthStatus.unauthenticated);
+      expect(notifier.state.user, isNull);
+    },
+  );
 }

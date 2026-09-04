@@ -3,6 +3,7 @@ import 'location_model.dart';
 import 'ride_model.dart';
 
 enum BookingStatus { pending, confirmed, rejected, cancelled, completed }
+
 enum PaymentStatus { pending, paid, refunded, failed }
 
 class BookingModel extends Equatable {
@@ -50,7 +51,8 @@ class BookingModel extends Equatable {
       selectedSeats: List<String>.from(json['selectedSeats'] ?? []),
       pickupLocation: LocationModel.fromJson(json['pickupLocation'] ?? {}),
       dropLocation: LocationModel.fromJson(json['dropLocation'] ?? {}),
-      contributionAmount: (json['contributionAmount'] as num?)?.toDouble() ?? 0.0,
+      contributionAmount:
+          (json['contributionAmount'] as num?)?.toDouble() ?? 0.0,
       platformFee: (json['platformFee'] as num?)?.toDouble() ?? 0.0,
       totalAmount: (json['totalAmount'] as num?)?.toDouble() ?? 0.0,
       bookingStatus: BookingStatus.values.firstWhere(
@@ -61,8 +63,11 @@ class BookingModel extends Equatable {
         (e) => e.name == json['paymentStatus'],
         orElse: () => PaymentStatus.pending,
       ),
-      requestedAt: DateTime.tryParse(json['requestedAt'] ?? '') ?? DateTime.now(),
-      rideDetails: json['rideDetails'] != null ? RideModel.fromJson(json['rideDetails']) : null,
+      requestedAt:
+          DateTime.tryParse(json['requestedAt'] ?? '') ?? DateTime.now(),
+      rideDetails: json['rideDetails'] != null
+          ? RideModel.fromJson(json['rideDetails'])
+          : null,
     );
   }
 
@@ -88,20 +93,20 @@ class BookingModel extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        rideId,
-        passengerId,
-        passengerName,
-        seatCount,
-        selectedSeats,
-        pickupLocation,
-        dropLocation,
-        contributionAmount,
-        platformFee,
-        totalAmount,
-        bookingStatus,
-        paymentStatus,
-        requestedAt,
-        rideDetails,
-      ];
+    id,
+    rideId,
+    passengerId,
+    passengerName,
+    seatCount,
+    selectedSeats,
+    pickupLocation,
+    dropLocation,
+    contributionAmount,
+    platformFee,
+    totalAmount,
+    bookingStatus,
+    paymentStatus,
+    requestedAt,
+    rideDetails,
+  ];
 }

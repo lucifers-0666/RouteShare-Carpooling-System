@@ -2,7 +2,6 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const otpService = require('../services/otpService');
 const passwordService = require('../services/passwordService');
-
 const { getJwtSecret, getJwtExpiresIn } = require('../config/jwt');
 
 const generateAccessToken = (userId) => {
@@ -13,65 +12,108 @@ const generateAccessToken = (userId) => {
 };
 
 /**
+ * Validates password policy:
+ * - Minimum 8 characters
+ * - At least one uppercase letter
+ * - At least one lowercase letter
+ * - At least one number
+ * - At least one special character
+ */
+const validatePasswordPolicy = (password) => {
+  if (!password || typeof password !== 'string') {
+    return 'Password is required';
+  }
+  if (password.length < 8) {
+    return 'Password must be at least 8 characters long';
+  }
+  if (!/[A-Z]/.test(password)) {
+    return 'Password must contain at least one uppercase letter';
+  }
+  if (!/[a-z]/.test(password)) {
+    return 'Password must contain at least one lowercase letter';
+  }
+  if (!/\d/.test(password)) {
+    return 'Password must contain at least one number';
+  }
+  if (!/[@$!%*?&#^()_\-+={}\[\]:;"'<>,.~`|\\]/.test(password)) {
+    return 'Password must contain at least one special character';
+  }
+  return null;
+};
+
+/**
  * POST /api/v1/auth/register
  */
 const register = async (req, res, next) => {
   try {
     const { name, email, phone, password } = req.body;
 
-    // Form Validations
-    if (!name || name.trim().length === 0) {
-      return res.status(400).json({ success: false, message: 'Name is required' });
+    // Full name validation
+    if (!name || name.trim().length < 2 || name.trim().length > 50) {
+      return res.status(400).json({ success: false, message: 'Name must be between 2 and 50 characters' });
     }
-    if (!email || !/\S+@\S+\.\S+/.test(email)) {
+
+    // Email validation
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!email || !emailRegex.test(email.trim())) {
       return res.status(400).json({ success: false, message: 'Please provide a valid email address' });
     }
+
+    // Indian mobile phone validation
     const cleanPhone = phone ? phone.toString().replace(/\D/g, '') : '';
-    if (cleanPhone.length < 10) {
-      return res.status(400).json({ success: false, message: 'Please provide a valid 10-digit mobile number' });
+    const phoneRegex = /^[6-9]\d{9}$/;
+    const localPhone = cleanPhone.length === 12 && cleanPhone.startsWith('91')
+        ? cleanPhone.substring(2)
+        : cleanPhone;
+
+    if (!phoneRegex.test(localPhone)) {
+      return res.status(400).json({ success: false, message: 'Please provide a valid 10-digit Indian mobile number' });
     }
-    if (!password || password.length < 6) {
-      return res.status(400).json({ success: false, message: 'Password must be at least 6 characters' });
+
+    // Password policy validation
+    const passwordError = validatePasswordPolicy(password);
+    if (passwordError) {
+      return res.status(400).json({ success: false, message: passwordError });
     }
 
     // Check duplicate email
-    const existingEmail = await User.findOne({ email: email.toLowerCase() });
+    const normalizedEmail = email.toLowerCase().trim();
+    const existingEmail = await User.findOne({ email: normalizedEmail });
     if (existingEmail) {
       return res.status(400).json({ success: false, message: 'An account with this email already exists' });
     }
 
     // Check duplicate phone
-    const formattedPhone = cleanPhone.length === 10 ? `+91${cleanPhone}` : phone;
+    const formattedPhone = `+91${localPhone}`;
     const existingPhone = await User.findOne({ phone: formattedPhone });
     if (existingPhone) {
       return res.status(400).json({ success: false, message: 'An account with this mobile number already exists' });
     }
 
-    // Generate initial OTP
-    const otpCode = otpService.generateOtpCode(4);
+    // Generate initial 6-digit cryptographic OTP
+    const otpCode = otpService.generateOtpCode(6);
     const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
 
     const user = await User.create({
       name: name.trim(),
-      email: email.toLowerCase().trim(),
+      email: normalizedEmail,
       phone: formattedPhone,
       password,
+      isVerified: false,
       otpInfo: {
         code: otpCode,
         expiresAt: otpExpires,
         attempts: 0,
+        verificationAttempts: 0,
         lastRequestedAt: new Date(),
       },
     });
 
     await otpService.sendOtp(formattedPhone, otpCode);
 
-    const token = generateAccessToken(user._id);
-
     return res.status(201).json({
       success: true,
-      message: 'Registration successful. OTP sent.',
-      accessToken: token,
+      message: 'Registration successful. OTP sent for verification.',
       user: user.toJSON(),
       devOtp: process.env.NODE_ENV !== 'production' ? otpCode : undefined,
     });
@@ -97,7 +139,10 @@ const login = async (req, res, next) => {
 
     if (!cleanInput.includes('@')) {
       const cleanPhone = cleanInput.replace(/\D/g, '');
-      const formattedPhone = cleanPhone.length === 10 ? `+91${cleanPhone}` : cleanInput;
+      const localPhone = cleanPhone.length === 12 && cleanPhone.startsWith('91')
+          ? cleanPhone.substring(2)
+          : cleanPhone;
+      const formattedPhone = localPhone.length === 10 ? `+91${localPhone}` : cleanInput;
       query = { phone: formattedPhone };
     }
 
@@ -117,6 +162,7 @@ const login = async (req, res, next) => {
       success: true,
       message: 'Login successful',
       accessToken: token,
+      token,
       user: user.toJSON(),
     });
   } catch (error) {
@@ -135,8 +181,15 @@ const sendOtp = async (req, res, next) => {
     }
 
     const cleanPhone = phone.toString().replace(/\D/g, '');
-    const formattedPhone = cleanPhone.length === 10 ? `+91${cleanPhone}` : phone;
+    const localPhone = cleanPhone.length === 12 && cleanPhone.startsWith('91')
+        ? cleanPhone.substring(2)
+        : cleanPhone;
 
+    if (localPhone.length !== 10) {
+      return res.status(400).json({ success: false, message: 'Please provide a valid 10-digit mobile number' });
+    }
+
+    const formattedPhone = `+91${localPhone}`;
     const user = await User.findOne({ phone: formattedPhone });
     if (!user) {
       return res.status(404).json({ success: false, message: 'User not found with this mobile number' });
@@ -146,11 +199,12 @@ const sendOtp = async (req, res, next) => {
       return res.status(429).json({ success: false, message: 'Too many OTP requests. Please try again in a few minutes.' });
     }
 
-    const otpCode = otpService.generateOtpCode(4);
+    const otpCode = otpService.generateOtpCode(6);
     user.otpInfo = {
       code: otpCode,
       expiresAt: new Date(Date.now() + 10 * 60 * 1000),
       attempts: (user.otpInfo?.attempts || 0) + 1,
+      verificationAttempts: 0,
       lastRequestedAt: new Date(),
     };
 
@@ -182,7 +236,10 @@ const verifyOtp = async (req, res, next) => {
       user = req.user;
     } else if (phone) {
       const cleanPhone = phone.toString().replace(/\D/g, '');
-      const formattedPhone = cleanPhone.length === 10 ? `+91${cleanPhone}` : phone;
+      const localPhone = cleanPhone.length === 12 && cleanPhone.startsWith('91')
+          ? cleanPhone.substring(2)
+          : cleanPhone;
+      const formattedPhone = localPhone.length === 10 ? `+91${localPhone}` : phone;
       user = await User.findOne({ phone: formattedPhone });
     }
 
@@ -195,11 +252,23 @@ const verifyOtp = async (req, res, next) => {
     }
 
     if (new Date() > new Date(user.otpInfo.expiresAt)) {
+      user.otpInfo = undefined;
+      await user.save();
       return res.status(400).json({ success: false, message: 'OTP has expired. Please request a new OTP.' });
     }
 
-    const isDevOtp = process.env.NODE_ENV !== 'production' && (otp.trim() === '1234' || otp.trim() === '0000');
-    if (!isDevOtp && user.otpInfo.code !== otp.trim()) {
+    // Check verification attempts limit (max 5)
+    user.otpInfo.verificationAttempts = (user.otpInfo.verificationAttempts || 0) + 1;
+    if (user.otpInfo.verificationAttempts > 5) {
+      user.otpInfo = undefined;
+      await user.save();
+      return res.status(400).json({ success: false, message: 'Too many failed verification attempts. Please request a new OTP.' });
+    }
+
+    const trimmedOtp = otp.toString().trim();
+    const isDevOtp = process.env.NODE_ENV !== 'production' && (trimmedOtp === '123456' || trimmedOtp === '000000');
+    if (!isDevOtp && user.otpInfo.code !== trimmedOtp) {
+      await user.save();
       return res.status(400).json({ success: false, message: 'Invalid OTP code' });
     }
 
@@ -214,6 +283,7 @@ const verifyOtp = async (req, res, next) => {
       success: true,
       message: 'Mobile number verified successfully',
       accessToken: token,
+      token,
       user: user.toJSON(),
     });
   } catch (error) {
@@ -262,8 +332,13 @@ const forgotPassword = async (req, res, next) => {
 const resetPassword = async (req, res, next) => {
   try {
     const { token, newPassword } = req.body;
-    if (!token || !newPassword || newPassword.length < 6) {
-      return res.status(400).json({ success: false, message: 'Valid token and new password (min 6 chars) are required' });
+    if (!token || !newPassword) {
+      return res.status(400).json({ success: false, message: 'Valid token and new password are required' });
+    }
+
+    const passwordError = validatePasswordPolicy(newPassword);
+    if (passwordError) {
+      return res.status(400).json({ success: false, message: passwordError });
     }
 
     const hashedToken = passwordService.hashToken(token);
@@ -297,4 +372,5 @@ module.exports = {
   verifyOtp,
   forgotPassword,
   resetPassword,
+  validatePasswordPolicy,
 };

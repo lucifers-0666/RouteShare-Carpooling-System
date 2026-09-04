@@ -75,7 +75,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
           if (e is ApiException && e.statusCode == 401) {
             await storageService.clearSession();
             apiClient.setAuthToken(null);
-            state = state.copyWith(status: AuthStatus.unauthenticated, user: null, token: null);
+            state = state.copyWith(
+              status: AuthStatus.unauthenticated,
+              user: null,
+              token: null,
+            );
             return;
           }
           // Network offline fallback: use cached user if available
@@ -142,13 +146,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
         password: password,
       );
 
-      final token = result['token'] as String;
       final user = result['user'] as UserModel;
       final devOtp = result['devOtp'] as String?;
 
       state = state.copyWith(
-        status: AuthStatus.authenticated,
-        token: token,
+        status: AuthStatus.unauthenticated,
         user: user,
         otpSentToPhone: phone,
         devOtp: devOtp,
@@ -188,20 +190,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
       final phone = state.otpSentToPhone ?? state.user?.phone ?? '';
       final result = await repository.verifyOtp(phone: phone, otp: otp);
 
-      final token = result['token']?.toString() ?? state.token ?? 'dev_token_verified';
+      final token = result['token']?.toString();
       final user = result['user'] is UserModel
           ? result['user'] as UserModel
-          : state.user ??
-              UserModel(
-                id: 'usr_verified',
-                name: 'Sahyān Member',
-                email: 'user@sahyan.app',
-                phone: phone,
-                city: 'Ahmedabad',
-                verificationStatus: UserVerificationStatus.verified,
-                rating: 5.0,
-                totalRides: 0,
-              );
+          : null;
+
+      if (token == null || user == null) {
+        throw Exception('Authentication failed: Missing token or user profile');
+      }
 
       state = state.copyWith(
         status: AuthStatus.authenticated,

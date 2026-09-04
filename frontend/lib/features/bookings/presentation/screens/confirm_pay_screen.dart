@@ -27,7 +27,9 @@ class _ConfirmPayScreenState extends ConsumerState<ConfirmPayScreen> {
 
     if (ride == null) return;
 
-    final booking = await ref.read(bookingsNotifierProvider.notifier).confirmBooking(
+    final booking = await ref
+        .read(bookingsNotifierProvider.notifier)
+        .confirmBooking(
           ride: ride,
           passengerId: authState.user?.id ?? 'usr_arjun_99',
           passengerName: authState.user?.name ?? 'Arjun Patel',
@@ -84,20 +86,34 @@ class _ConfirmPayScreenState extends ConsumerState<ConfirmPayScreen> {
                     const SizedBox(height: 12),
                     Row(
                       children: [
-                        const Icon(Icons.directions_car_filled, color: AppColors.primaryForest),
+                        const Icon(
+                          Icons.directions_car_filled,
+                          color: AppColors.primaryForest,
+                        ),
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
                             '${ride.origin.city} → ${ride.destination.city}',
-                            style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold),
+                            style: AppTypography.bodyLarge.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 8),
-                    Text('Driver: ${ride.driverName} (${ride.vehicle.fullName})', style: AppTypography.secondary),
-                    Text('Seats: ${selectedSeats.join(', ')}', style: AppTypography.secondary),
-                    Text('Departure: ${ride.departureTime}', style: AppTypography.secondary),
+                    Text(
+                      'Driver: ${ride.driverName} (${ride.vehicle.fullName})',
+                      style: AppTypography.secondary,
+                    ),
+                    Text(
+                      'Seats: ${selectedSeats.join(', ')}',
+                      style: AppTypography.secondary,
+                    ),
+                    Text(
+                      'Departure: ${ride.departureTime}',
+                      style: AppTypography.secondary,
+                    ),
                   ],
                 ),
               ),
@@ -114,14 +130,24 @@ class _ConfirmPayScreenState extends ConsumerState<ConfirmPayScreen> {
                   children: [
                     Text('Price Breakdown', style: AppTypography.sectionHeader),
                     const SizedBox(height: 16),
-                    _buildPriceRow('Seat Contribution (${selectedSeats.length} seat)', '₹${contribution.toStringAsFixed(0)}'),
+                    _buildPriceRow(
+                      'Seat Contribution (${selectedSeats.length} seat)',
+                      '₹${contribution.toStringAsFixed(0)}',
+                    ),
                     const SizedBox(height: 8),
-                    _buildPriceRow('Platform & Escrow Fee', '₹${platformFee.toStringAsFixed(0)}'),
+                    _buildPriceRow(
+                      'Platform & Escrow Fee',
+                      '₹${platformFee.toStringAsFixed(0)}',
+                    ),
                     const Padding(
                       padding: EdgeInsets.symmetric(vertical: 12.0),
                       child: Divider(color: AppColors.border),
                     ),
-                    _buildPriceRow('Total Payable', '₹${total.toStringAsFixed(0)}', isTotal: true),
+                    _buildPriceRow(
+                      'Total Payable',
+                      '₹${total.toStringAsFixed(0)}',
+                      isTotal: true,
+                    ),
                   ],
                 ),
               ),
@@ -135,17 +161,28 @@ class _ConfirmPayScreenState extends ConsumerState<ConfirmPayScreen> {
               decoration: BoxDecoration(
                 color: AppColors.softBrass,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColors.mutedBrass.withValues(alpha: 0.4)),
+                border: Border.all(
+                  color: AppColors.mutedBrass.withValues(alpha: 0.4),
+                ),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.shield_outlined, color: AppColors.mutedBrass, size: 28),
+                  const Icon(
+                    Icons.shield_outlined,
+                    color: AppColors.mutedBrass,
+                    size: 28,
+                  ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Sahyān Escrow Protection', style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.bold)),
+                        Text(
+                          'Sahyān Escrow Protection',
+                          style: AppTypography.bodyMedium.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                         const SizedBox(height: 2),
                         Text(
                           'Payment is held securely in escrow and released to the driver only after journey completion.',
@@ -183,12 +220,16 @@ class _ConfirmPayScreenState extends ConsumerState<ConfirmPayScreen> {
           title,
           style: isTotal
               ? AppTypography.sectionHeader
-              : AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
+              : AppTypography.bodyMedium.copyWith(
+                  color: AppColors.textSecondary,
+                ),
         ),
         Text(
           amount,
           style: isTotal
-              ? AppTypography.screenTitle.copyWith(color: AppColors.primaryForest)
+              ? AppTypography.screenTitle.copyWith(
+                  color: AppColors.primaryForest,
+                )
               : AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold),
         ),
       ],

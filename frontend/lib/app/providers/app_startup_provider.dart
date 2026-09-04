@@ -18,10 +18,7 @@ class AppStartupState {
     this.errorMessage,
   });
 
-  AppStartupState copyWith({
-    AppStartupStatus? status,
-    String? errorMessage,
-  }) {
+  AppStartupState copyWith({AppStartupStatus? status, String? errorMessage}) {
     return AppStartupState(
       status: status ?? this.status,
       errorMessage: errorMessage ?? this.errorMessage,
@@ -34,10 +31,8 @@ class AppStartupNotifier extends StateNotifier<AppStartupState> {
   final AuthNotifier authNotifier;
   bool _isOverridden = false;
 
-  AppStartupNotifier({
-    required this.storageService,
-    required this.authNotifier,
-  }) : super(const AppStartupState()) {
+  AppStartupNotifier({required this.storageService, required this.authNotifier})
+    : super(const AppStartupState()) {
     initialize();
   }
 
@@ -45,7 +40,8 @@ class AppStartupNotifier extends StateNotifier<AppStartupState> {
     _isOverridden = false;
     state = const AppStartupState(status: AppStartupStatus.initializing);
     try {
-      final hasCompletedOnboarding = await storageService.hasCompletedOnboarding();
+      final hasCompletedOnboarding = await storageService
+          .hasCompletedOnboarding();
       final token = await storageService.getToken();
 
       if (_isOverridden) return;
@@ -62,9 +58,13 @@ class AppStartupNotifier extends StateNotifier<AppStartupState> {
       if (_isOverridden) return;
 
       if (!hasCompletedOnboarding) {
-        state = const AppStartupState(status: AppStartupStatus.onboardingRequired);
+        state = const AppStartupState(
+          status: AppStartupStatus.onboardingRequired,
+        );
       } else {
-        state = const AppStartupState(status: AppStartupStatus.authEntryRequired);
+        state = const AppStartupState(
+          status: AppStartupStatus.authEntryRequired,
+        );
       }
     } catch (e) {
       if (_isOverridden) return;
@@ -90,11 +90,12 @@ class AppStartupNotifier extends StateNotifier<AppStartupState> {
   }
 }
 
-final appStartupProvider = StateNotifierProvider<AppStartupNotifier, AppStartupState>((ref) {
-  final storageService = ref.watch(secureStorageServiceProvider);
-  final authNotifier = ref.watch(authProvider.notifier);
-  return AppStartupNotifier(
-    storageService: storageService,
-    authNotifier: authNotifier,
-  );
-});
+final appStartupProvider =
+    StateNotifierProvider<AppStartupNotifier, AppStartupState>((ref) {
+      final storageService = ref.watch(secureStorageServiceProvider);
+      final authNotifier = ref.watch(authProvider.notifier);
+      return AppStartupNotifier(
+        storageService: storageService,
+        authNotifier: authNotifier,
+      );
+    });

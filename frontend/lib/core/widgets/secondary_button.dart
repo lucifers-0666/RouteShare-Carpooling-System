@@ -24,9 +24,7 @@ class SecondaryButton extends StatelessWidget {
         foregroundColor: AppColors.primaryForest,
         minimumSize: const Size(double.infinity, 50),
         side: const BorderSide(color: AppColors.primaryForest, width: 1.5),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
       child: isLoading
           ? const SizedBox(
@@ -46,7 +44,9 @@ class SecondaryButton extends StatelessWidget {
                 ],
                 Text(
                   text,
-                  style: AppTypography.button.copyWith(color: AppColors.primaryForest),
+                  style: AppTypography.button.copyWith(
+                    color: AppColors.primaryForest,
+                  ),
                 ),
               ],
             ),

@@ -29,7 +29,9 @@ final rideSearchQueryProvider = StateProvider<RideSearchQuery>((ref) {
   );
 });
 
-final searchRidesProvider = FutureProvider.autoDispose<List<RideModel>>((ref) async {
+final searchRidesProvider = FutureProvider.autoDispose<List<RideModel>>((
+  ref,
+) async {
   final repo = ref.watch(ridesRepositoryProvider);
   final query = ref.watch(rideSearchQueryProvider);
   return repo.searchRides(

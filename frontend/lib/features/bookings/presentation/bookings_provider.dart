@@ -40,9 +40,11 @@ class BookingsNotifier extends StateNotifier<AsyncValue<List<BookingModel>>> {
 }
 
 final bookingsNotifierProvider =
-    StateNotifierProvider<BookingsNotifier, AsyncValue<List<BookingModel>>>((ref) {
-  final repo = ref.watch(bookingsRepositoryProvider);
-  return BookingsNotifier(repo);
-});
+    StateNotifierProvider<BookingsNotifier, AsyncValue<List<BookingModel>>>((
+      ref,
+    ) {
+      final repo = ref.watch(bookingsRepositoryProvider);
+      return BookingsNotifier(repo);
+    });
 
 final activeBookingProvider = StateProvider<BookingModel?>((ref) => null);

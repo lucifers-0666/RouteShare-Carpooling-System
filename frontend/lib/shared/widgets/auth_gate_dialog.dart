@@ -14,7 +14,8 @@ class AuthGateDialog extends ConsumerWidget {
   const AuthGateDialog({
     super.key,
     this.title = 'Account Required',
-    this.message = 'To ensure community safety, route verification, and seat allocation, please sign in or create a Sahyān account.',
+    this.message =
+        'To ensure community safety, route verification, and seat allocation, please sign in or create a Sahyān account.',
     this.intendedRoute,
   });
 
@@ -30,7 +31,9 @@ class AuthGateDialog extends ConsumerWidget {
       backgroundColor: Colors.transparent,
       builder: (ctx) => AuthGateDialog(
         title: title ?? 'Account Required',
-        message: message ?? 'To ensure community safety, route verification, and seat allocation, please sign in or create a Sahyān account.',
+        message:
+            message ??
+            'To ensure community safety, route verification, and seat allocation, please sign in or create a Sahyān account.',
         intendedRoute: intendedRoute,
       ),
     );
@@ -91,16 +94,15 @@ class AuthGateDialog extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: 12),
-            Text(
-              message,
-              style: AppTypography.secondary.copyWith(height: 1.5),
-            ),
+            Text(message, style: AppTypography.secondary.copyWith(height: 1.5)),
             const SizedBox(height: 24),
             PrimaryButton(
               text: 'Create Account',
               onPressed: () {
                 if (intendedRoute != null) {
-                  ref.read(userModeProvider.notifier).setPendingProtectedIntent(intendedRoute);
+                  ref
+                      .read(userModeProvider.notifier)
+                      .setPendingProtectedIntent(intendedRoute);
                 }
                 Navigator.of(context).pop(false);
                 context.push('/register');
@@ -111,18 +113,24 @@ class AuthGateDialog extends ConsumerWidget {
               style: OutlinedButton.styleFrom(
                 minimumSize: const Size.fromHeight(50),
                 side: const BorderSide(color: AppColors.border),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
               onPressed: () {
                 if (intendedRoute != null) {
-                  ref.read(userModeProvider.notifier).setPendingProtectedIntent(intendedRoute);
+                  ref
+                      .read(userModeProvider.notifier)
+                      .setPendingProtectedIntent(intendedRoute);
                 }
                 Navigator.of(context).pop(false);
                 context.push('/login');
               },
               child: Text(
                 'Log In to Existing Account',
-                style: AppTypography.button.copyWith(color: AppColors.primaryForest),
+                style: AppTypography.button.copyWith(
+                  color: AppColors.primaryForest,
+                ),
               ),
             ),
             const SizedBox(height: 8),
@@ -130,7 +138,9 @@ class AuthGateDialog extends ConsumerWidget {
               onPressed: () => Navigator.of(context).pop(false),
               child: Text(
                 'Continue Exploring',
-                style: AppTypography.caption.copyWith(color: AppColors.textSecondary),
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.textSecondary,
+                ),
               ),
             ),
           ],

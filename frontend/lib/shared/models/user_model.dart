@@ -49,7 +49,9 @@ class UserModel extends Equatable {
       city: json['city'] ?? '',
       verificationStatus: UserVerificationStatus.values.firstWhere(
         (e) => e.name == json['verificationStatus'],
-        orElse: () => json['isVerified'] == true ? UserVerificationStatus.verified : UserVerificationStatus.pending,
+        orElse: () => json['isVerified'] == true
+            ? UserVerificationStatus.verified
+            : UserVerificationStatus.pending,
       ),
       rating: json['rating'] is Map
           ? ((json['rating']['average'] as num?)?.toDouble() ?? 4.9)
@@ -60,7 +62,10 @@ class UserModel extends Equatable {
       role: json['role'] ?? 'user',
       canRide: capabilities?['canRide'] ?? json['canRide'] ?? true,
       canDrive: capabilities?['canDrive'] ?? json['canDrive'] ?? false,
-      driverOnboardingStatus: driverProfile?['onboardingStatus'] ?? json['driverOnboardingStatus'] ?? 'not_started',
+      driverOnboardingStatus:
+          driverProfile?['onboardingStatus'] ??
+          json['driverOnboardingStatus'] ??
+          'not_started',
     );
   }
 
@@ -84,18 +89,18 @@ class UserModel extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        name,
-        phone,
-        email,
-        profilePhoto,
-        city,
-        verificationStatus,
-        rating,
-        totalRides,
-        role,
-        canRide,
-        canDrive,
-        driverOnboardingStatus,
-      ];
+    id,
+    name,
+    phone,
+    email,
+    profilePhoto,
+    city,
+    verificationStatus,
+    rating,
+    totalRides,
+    role,
+    canRide,
+    canDrive,
+    driverOnboardingStatus,
+  ];
 }

@@ -9,11 +9,7 @@ class RideCard extends StatelessWidget {
   final RideModel ride;
   final VoidCallback onTap;
 
-  const RideCard({
-    super.key,
-    required this.ride,
-    required this.onTap,
-  });
+  const RideCard({super.key, required this.ride, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +33,10 @@ class RideCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.softForest,
                       borderRadius: BorderRadius.circular(20),
@@ -45,7 +44,11 @@ class RideCard extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.auto_awesome, size: 14, color: AppColors.primaryForest),
+                        const Icon(
+                          Icons.auto_awesome,
+                          size: 14,
+                          color: AppColors.primaryForest,
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           '${ride.matchPercentage}% Route Match',
@@ -75,13 +78,17 @@ class RideCard extends StatelessWidget {
                   // Timeline graphic
                   Column(
                     children: [
-                      const Icon(Icons.radio_button_checked, size: 16, color: AppColors.primaryForest),
-                      Container(
-                        width: 2,
-                        height: 32,
-                        color: AppColors.border,
+                      const Icon(
+                        Icons.radio_button_checked,
+                        size: 16,
+                        color: AppColors.primaryForest,
                       ),
-                      const Icon(Icons.location_on, size: 16, color: AppColors.mutedSage),
+                      Container(width: 2, height: 32, color: AppColors.border),
+                      const Icon(
+                        Icons.location_on,
+                        size: 16,
+                        color: AppColors.mutedSage,
+                      ),
                     ],
                   ),
                   const SizedBox(width: 12),
@@ -96,13 +103,20 @@ class RideCard extends StatelessWidget {
                           children: [
                             Expanded(
                               child: Text(
-                                ride.origin.city.isNotEmpty ? ride.origin.city : ride.origin.address,
-                                style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold),
+                                ride.origin.city.isNotEmpty
+                                    ? ride.origin.city
+                                    : ride.origin.address,
+                                style: AppTypography.bodyLarge.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                            Text(ride.departureTime, style: AppTypography.bodyMedium),
+                            Text(
+                              ride.departureTime,
+                              style: AppTypography.bodyMedium,
+                            ),
                           ],
                         ),
                         const SizedBox(height: 16),
@@ -111,13 +125,20 @@ class RideCard extends StatelessWidget {
                           children: [
                             Expanded(
                               child: Text(
-                                ride.destination.city.isNotEmpty ? ride.destination.city : ride.destination.address,
-                                style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold),
+                                ride.destination.city.isNotEmpty
+                                    ? ride.destination.city
+                                    : ride.destination.address,
+                                style: AppTypography.bodyLarge.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                            Text(ride.estimatedArrival, style: AppTypography.secondary),
+                            Text(
+                              ride.estimatedArrival,
+                              style: AppTypography.secondary,
+                            ),
                           ],
                         ),
                       ],
@@ -154,13 +175,17 @@ class RideCard extends StatelessWidget {
                             Flexible(
                               child: Text(
                                 ride.driverName,
-                                style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
+                                style: AppTypography.bodyMedium.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
                             const SizedBox(width: 6),
-                            VerificationBadge(isVerified: ride.isDriverVerified),
+                            VerificationBadge(
+                              isVerified: ride.isDriverVerified,
+                            ),
                           ],
                         ),
                         const SizedBox(height: 2),
@@ -182,7 +207,10 @@ class RideCard extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.warmBackground,
                       borderRadius: BorderRadius.circular(8),
@@ -190,7 +218,9 @@ class RideCard extends StatelessWidget {
                     ),
                     child: Text(
                       '${ride.availableSeats} seat(s) left',
-                      style: AppTypography.caption.copyWith(fontWeight: FontWeight.w600),
+                      style: AppTypography.caption.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ],

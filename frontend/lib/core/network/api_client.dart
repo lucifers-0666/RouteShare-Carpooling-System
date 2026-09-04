@@ -20,17 +20,15 @@ class ApiClient {
   String? _authToken;
   static String? _resolvedBaseUrl;
 
-  ApiClient({
-    String? baseUrl,
-    http.Client? client,
-  })  : baseUrl = baseUrl ?? _defaultBaseUrl,
-        _client = client ?? http.Client();
+  ApiClient({String? baseUrl, http.Client? client})
+    : baseUrl = baseUrl ?? _defaultBaseUrl,
+      _client = client ?? http.Client();
 
   static const List<String> _androidCandidateHosts = [
-    'http://127.0.0.1:5000/api/v1',       // 1. USB cable via adb reverse (fastest: ~2ms)
-    'http://localhost:5000/api/v1',       // 2. USB localhost
-    'http://10.153.237.149:5000/api/v1',  // 3. Local Wi-Fi network
-    'http://10.0.2.2:5000/api/v1',        // 4. Android emulator
+    'http://127.0.0.1:5000/api/v1', // 1. USB cable via adb reverse (fastest: ~2ms)
+    'http://localhost:5000/api/v1', // 2. USB localhost
+    'http://10.153.237.149:5000/api/v1', // 3. Local Wi-Fi network
+    'http://10.0.2.2:5000/api/v1', // 4. Android emulator
   ];
 
   static String get _defaultBaseUrl {
@@ -62,8 +60,12 @@ class ApiClient {
     try {
       final futures = _androidCandidateHosts.map((candidate) async {
         try {
-          final pingUri = Uri.parse(candidate.replaceAll('/api/v1', '/api/health'));
-          final res = await _client.get(pingUri).timeout(const Duration(milliseconds: 1200));
+          final pingUri = Uri.parse(
+            candidate.replaceAll('/api/v1', '/api/health'),
+          );
+          final res = await _client
+              .get(pingUri)
+              .timeout(const Duration(milliseconds: 1200));
           if (res.statusCode >= 200 && res.statusCode < 400) {
             return candidate;
           }
@@ -168,7 +170,8 @@ class ApiClient {
       return jsonResponseBody;
     }
 
-    final message = jsonResponseBody is Map && jsonResponseBody.containsKey('message')
+    final message =
+        jsonResponseBody is Map && jsonResponseBody.containsKey('message')
         ? jsonResponseBody['message']
         : 'Request failed with status ${response.statusCode}';
 
@@ -179,10 +182,14 @@ class ApiClient {
     _resolvedBaseUrl = null;
     if (error is ApiException) return error;
     if (error is TimeoutException) {
-      return ApiException('Connection timed out. Please verify the backend server is running and port 5000 is forwarded.');
+      return ApiException(
+        'Connection timed out. Please verify the backend server is running and port 5000 is forwarded.',
+      );
     }
     if (error is SocketException) {
-      return ApiException('Cannot connect to backend server. Run "adb reverse tcp:5000 tcp:5000" or connect to the same Wi-Fi.');
+      return ApiException(
+        'Cannot connect to backend server. Run "adb reverse tcp:5000 tcp:5000" or connect to the same Wi-Fi.',
+      );
     }
     return ApiException(error.toString());
   }

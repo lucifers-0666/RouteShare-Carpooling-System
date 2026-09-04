@@ -37,7 +37,8 @@ class MockTestSecureStorage implements SecureStorageService {
   }
 
   @override
-  Future<void> setCompletedOnboarding(bool completed) async => _onboardingCompleted = completed;
+  Future<void> setCompletedOnboarding(bool completed) async =>
+      _onboardingCompleted = completed;
 
   @override
   Future<bool> hasCompletedOnboarding() async => _onboardingCompleted;
@@ -45,7 +46,10 @@ class MockTestSecureStorage implements SecureStorageService {
 
 class MockTestAuthRepository implements AuthRepository {
   @override
-  Future<Map<String, dynamic>> login({required String identifier, required String password}) async => {};
+  Future<Map<String, dynamic>> login({
+    required String identifier,
+    required String password,
+  }) async => {};
 
   @override
   Future<Map<String, dynamic>> register({
@@ -59,13 +63,19 @@ class MockTestAuthRepository implements AuthRepository {
   Future<Map<String, dynamic>> sendOtp(String phone) async => {};
 
   @override
-  Future<Map<String, dynamic>> verifyOtp({required String phone, required String otp}) async => {};
+  Future<Map<String, dynamic>> verifyOtp({
+    required String phone,
+    required String otp,
+  }) async => {};
 
   @override
   Future<Map<String, dynamic>> forgotPassword(String email) async => {};
 
   @override
-  Future<Map<String, dynamic>> resetPassword({required String token, required String newPassword}) async => {};
+  Future<Map<String, dynamic>> resetPassword({
+    required String token,
+    required String newPassword,
+  }) async => {};
 
   @override
   Future<UserModel> getProfile() async {
@@ -102,51 +112,63 @@ void main() {
   });
 
   group('AppStartupNotifier Tests', () {
-    test('Fresh install with no token transitions to onboardingRequired', () async {
-      final startup = AppStartupNotifier(
-        storageService: storage,
-        authNotifier: authNotifier,
-      );
+    test(
+      'Fresh install with no token transitions to onboardingRequired',
+      () async {
+        final startup = AppStartupNotifier(
+          storageService: storage,
+          authNotifier: authNotifier,
+        );
 
-      await Future.delayed(Duration.zero);
-      expect(startup.state.status, AppStartupStatus.onboardingRequired);
-    });
+        await Future.delayed(Duration.zero);
+        expect(startup.state.status, AppStartupStatus.onboardingRequired);
+      },
+    );
 
-    test('Onboarding completion updates storage and transitions to authEntryRequired', () async {
-      final startup = AppStartupNotifier(
-        storageService: storage,
-        authNotifier: authNotifier,
-      );
+    test(
+      'Onboarding completion updates storage and transitions to authEntryRequired',
+      () async {
+        final startup = AppStartupNotifier(
+          storageService: storage,
+          authNotifier: authNotifier,
+        );
 
-      await startup.completeOnboarding();
-      expect(await storage.hasCompletedOnboarding(), isTrue);
-      expect(startup.state.status, AppStartupStatus.authEntryRequired);
-    });
+        await startup.completeOnboarding();
+        expect(await storage.hasCompletedOnboarding(), isTrue);
+        expect(startup.state.status, AppStartupStatus.authEntryRequired);
+      },
+    );
 
-    test('Existing user who completed onboarding transitions to authEntryRequired when unauthenticated', () async {
-      await storage.setCompletedOnboarding(true);
+    test(
+      'Existing user who completed onboarding transitions to authEntryRequired when unauthenticated',
+      () async {
+        await storage.setCompletedOnboarding(true);
 
-      final startup = AppStartupNotifier(
-        storageService: storage,
-        authNotifier: authNotifier,
-      );
+        final startup = AppStartupNotifier(
+          storageService: storage,
+          authNotifier: authNotifier,
+        );
 
-      await Future.delayed(Duration.zero);
-      expect(startup.state.status, AppStartupStatus.authEntryRequired);
-    });
+        await Future.delayed(Duration.zero);
+        expect(startup.state.status, AppStartupStatus.authEntryRequired);
+      },
+    );
 
-    test('Authenticated user with valid session transitions directly to ready', () async {
-      await storage.setCompletedOnboarding(true);
-      await storage.saveToken('valid_jwt_token');
+    test(
+      'Authenticated user with valid session transitions directly to ready',
+      () async {
+        await storage.setCompletedOnboarding(true);
+        await storage.saveToken('valid_jwt_token');
 
-      final startup = AppStartupNotifier(
-        storageService: storage,
-        authNotifier: authNotifier,
-      );
+        final startup = AppStartupNotifier(
+          storageService: storage,
+          authNotifier: authNotifier,
+        );
 
-      await Future.delayed(const Duration(milliseconds: 50));
-      expect(startup.state.status, AppStartupStatus.ready);
-    });
+        await Future.delayed(const Duration(milliseconds: 50));
+        expect(startup.state.status, AppStartupStatus.ready);
+      },
+    );
   });
 
   group('UserModeNotifier Tests', () {
@@ -185,39 +207,45 @@ void main() {
   });
 
   group('UserModel Unified Capabilities Tests', () {
-    test('Default user has passenger capability and inactive driver capability', () {
-      const user = UserModel(
-        id: 'usr_test_1',
-        name: 'Arjun Patel',
-        phone: '+919876543210',
-        email: 'arjun@example.com',
-        city: 'Ahmedabad',
-        verificationStatus: UserVerificationStatus.verified,
-        rating: 4.9,
-        totalRides: 8,
-      );
+    test(
+      'Default user has passenger capability and inactive driver capability',
+      () {
+        const user = UserModel(
+          id: 'usr_test_1',
+          name: 'Arjun Patel',
+          phone: '+919876543210',
+          email: 'arjun@example.com',
+          city: 'Ahmedabad',
+          verificationStatus: UserVerificationStatus.verified,
+          rating: 4.9,
+          totalRides: 8,
+        );
 
-      expect(user.canRide, isTrue);
-      expect(user.canDrive, isFalse);
-      expect(user.driverOnboardingStatus, 'not_started');
-      expect(user.isDriverEligible, isFalse);
-    });
+        expect(user.canRide, isTrue);
+        expect(user.canDrive, isFalse);
+        expect(user.driverOnboardingStatus, 'not_started');
+        expect(user.isDriverEligible, isFalse);
+      },
+    );
 
-    test('User becomes driver eligible only when canDrive is true and driverOnboardingStatus is approved', () {
-      const driverUser = UserModel(
-        id: 'usr_driver_1',
-        name: 'Priya Shah',
-        phone: '+919876543211',
-        email: 'priya@example.com',
-        city: 'Vadodara',
-        verificationStatus: UserVerificationStatus.verified,
-        rating: 5.0,
-        totalRides: 20,
-        canDrive: true,
-        driverOnboardingStatus: 'approved',
-      );
+    test(
+      'User becomes driver eligible only when canDrive is true and driverOnboardingStatus is approved',
+      () {
+        const driverUser = UserModel(
+          id: 'usr_driver_1',
+          name: 'Priya Shah',
+          phone: '+919876543211',
+          email: 'priya@example.com',
+          city: 'Vadodara',
+          verificationStatus: UserVerificationStatus.verified,
+          rating: 5.0,
+          totalRides: 20,
+          canDrive: true,
+          driverOnboardingStatus: 'approved',
+        );
 
-      expect(driverUser.isDriverEligible, isTrue);
-    });
+        expect(driverUser.isDriverEligible, isTrue);
+      },
+    );
   });
 }

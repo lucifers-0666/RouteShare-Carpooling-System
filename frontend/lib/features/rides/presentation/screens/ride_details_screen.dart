@@ -49,7 +49,9 @@ class RideDetailsScreen extends ConsumerWidget {
                       backgroundColor: AppColors.softForest,
                       child: Text(
                         ride.driverName.substring(0, 1).toUpperCase(),
-                        style: AppTypography.screenTitle.copyWith(color: AppColors.primaryForest),
+                        style: AppTypography.screenTitle.copyWith(
+                          color: AppColors.primaryForest,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 14),
@@ -68,16 +70,24 @@ class RideDetailsScreen extends ConsumerWidget {
                                 ),
                               ),
                               const SizedBox(width: 6),
-                              VerificationBadge(isVerified: ride.isDriverVerified),
+                              VerificationBadge(
+                                isVerified: ride.isDriverVerified,
+                              ),
                             ],
                           ),
                           const SizedBox(height: 4),
-                          RatingDisplay(rating: ride.driverRating, reviewCount: 42),
+                          RatingDisplay(
+                            rating: ride.driverRating,
+                            reviewCount: 42,
+                          ),
                         ],
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.chat_bubble_outline_rounded, color: AppColors.primaryForest),
+                      icon: const Icon(
+                        Icons.chat_bubble_outline_rounded,
+                        color: AppColors.primaryForest,
+                      ),
                       onPressed: () {},
                     ),
                   ],
@@ -97,7 +107,10 @@ class RideDetailsScreen extends ConsumerWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Journey Route', style: AppTypography.sectionHeader),
+                        Text(
+                          'Journey Route',
+                          style: AppTypography.sectionHeader,
+                        ),
                         Text(
                           '${ride.routeDistanceKm} km • ${ride.durationMins} mins',
                           style: AppTypography.caption,
@@ -110,9 +123,21 @@ class RideDetailsScreen extends ConsumerWidget {
                       children: [
                         Column(
                           children: [
-                            const Icon(Icons.radio_button_checked, size: 18, color: AppColors.primaryForest),
-                            Container(width: 2, height: 40, color: AppColors.border),
-                            const Icon(Icons.location_on, size: 18, color: AppColors.mutedSage),
+                            const Icon(
+                              Icons.radio_button_checked,
+                              size: 18,
+                              color: AppColors.primaryForest,
+                            ),
+                            Container(
+                              width: 2,
+                              height: 40,
+                              color: AppColors.border,
+                            ),
+                            const Icon(
+                              Icons.location_on,
+                              size: 18,
+                              color: AppColors.mutedSage,
+                            ),
                           ],
                         ),
                         const SizedBox(width: 14),
@@ -120,13 +145,39 @@ class RideDetailsScreen extends ConsumerWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(ride.departureTime, style: AppTypography.caption.copyWith(fontWeight: FontWeight.bold)),
-                              Text(ride.origin.address, style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w600)),
-                              Text(ride.origin.city, style: AppTypography.secondary),
+                              Text(
+                                ride.departureTime,
+                                style: AppTypography.caption.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                ride.origin.address,
+                                style: AppTypography.bodyLarge.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              Text(
+                                ride.origin.city,
+                                style: AppTypography.secondary,
+                              ),
                               const SizedBox(height: 16),
-                              Text(ride.estimatedArrival, style: AppTypography.caption.copyWith(fontWeight: FontWeight.bold)),
-                              Text(ride.destination.address, style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w600)),
-                              Text(ride.destination.city, style: AppTypography.secondary),
+                              Text(
+                                ride.estimatedArrival,
+                                style: AppTypography.caption.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                ride.destination.address,
+                                style: AppTypography.bodyLarge.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              Text(
+                                ride.destination.city,
+                                style: AppTypography.secondary,
+                              ),
                             ],
                           ),
                         ),
@@ -151,26 +202,46 @@ class RideDetailsScreen extends ConsumerWidget {
                         color: AppColors.warmBackground,
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(Icons.directions_car_rounded, color: AppColors.primaryForest, size: 28),
+                      child: const Icon(
+                        Icons.directions_car_rounded,
+                        color: AppColors.primaryForest,
+                        size: 28,
+                      ),
                     ),
                     const SizedBox(width: 14),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(ride.vehicle.fullName, style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold)),
+                          Text(
+                            ride.vehicle.fullName,
+                            style: AppTypography.bodyLarge.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                           const SizedBox(height: 2),
-                          Text('Plate: ${ride.vehicle.registrationNumber}', style: AppTypography.secondary),
+                          Text(
+                            'Plate: ${ride.vehicle.registrationNumber}',
+                            style: AppTypography.secondary,
+                          ),
                         ],
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.softForest,
                         borderRadius: BorderRadius.circular(6),
                       ),
-                      child: Text('Verified Vehicle', style: AppTypography.caption.copyWith(color: AppColors.primaryForest)),
+                      child: Text(
+                        'Verified Vehicle',
+                        style: AppTypography.caption.copyWith(
+                          color: AppColors.primaryForest,
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -186,7 +257,10 @@ class RideDetailsScreen extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Ride Amenities & Preferences', style: AppTypography.sectionHeader),
+                    Text(
+                      'Ride Amenities & Preferences',
+                      style: AppTypography.sectionHeader,
+                    ),
                     const SizedBox(height: 12),
                     Wrap(
                       spacing: 8,
@@ -221,7 +295,9 @@ class RideDetailsScreen extends ConsumerWidget {
                 Text('Seat Contribution', style: AppTypography.caption),
                 Text(
                   '₹${ride.contributionPerSeat.toStringAsFixed(0)}',
-                  style: AppTypography.screenTitle.copyWith(color: AppColors.primaryForest),
+                  style: AppTypography.screenTitle.copyWith(
+                    color: AppColors.primaryForest,
+                  ),
                 ),
               ],
             ),
@@ -235,7 +311,8 @@ class RideDetailsScreen extends ConsumerWidget {
                     AuthGateDialog.show(
                       context,
                       title: 'Sign In to Book Seats',
-                      message: 'To reserve seats and communicate with verified drivers, please sign in or register.',
+                      message:
+                          'To reserve seats and communicate with verified drivers, please sign in or register.',
                       intendedRoute: '/seat-selection',
                     );
                     return;

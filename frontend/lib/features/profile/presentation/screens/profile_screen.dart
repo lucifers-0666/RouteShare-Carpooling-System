@@ -22,7 +22,10 @@ class ProfileScreen extends ConsumerWidget {
         title: Text('Account Profile', style: AppTypography.screenTitle),
         actions: [
           IconButton(
-            icon: const Icon(Icons.settings_outlined, color: AppColors.textPrimary),
+            icon: const Icon(
+              Icons.settings_outlined,
+              color: AppColors.textPrimary,
+            ),
             onPressed: () {},
           ),
         ],
@@ -41,8 +44,13 @@ class ProfileScreen extends ConsumerWidget {
                       radius: 36,
                       backgroundColor: AppColors.softForest,
                       child: Text(
-                        (user?.name.isNotEmpty ?? false) ? user!.name[0].toUpperCase() : 'A',
-                        style: AppTypography.screenTitle.copyWith(fontSize: 32, color: AppColors.primaryForest),
+                        (user?.name.isNotEmpty ?? false)
+                            ? user!.name[0].toUpperCase()
+                            : 'A',
+                        style: AppTypography.screenTitle.copyWith(
+                          fontSize: 32,
+                          color: AppColors.primaryForest,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -52,7 +60,9 @@ class ProfileScreen extends ConsumerWidget {
                         Flexible(
                           child: Text(
                             user?.name ?? 'Arjun Patel',
-                            style: AppTypography.screenTitle.copyWith(fontSize: 20),
+                            style: AppTypography.screenTitle.copyWith(
+                              fontSize: 20,
+                            ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -62,15 +72,27 @@ class ProfileScreen extends ConsumerWidget {
                       ],
                     ),
                     const SizedBox(height: 4),
-                    Text(user?.email ?? 'arjun.patel@example.com', style: AppTypography.secondary),
-                    Text(user?.phone ?? '+91 9876543210', style: AppTypography.secondary),
+                    Text(
+                      user?.email ?? 'arjun.patel@example.com',
+                      style: AppTypography.secondary,
+                    ),
+                    Text(
+                      user?.phone ?? '+91 9876543210',
+                      style: AppTypography.secondary,
+                    ),
                     const SizedBox(height: 12),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        RatingDisplay(rating: user?.rating ?? 4.9, reviewCount: user?.totalRides ?? 14),
+                        RatingDisplay(
+                          rating: user?.rating ?? 4.9,
+                          reviewCount: user?.totalRides ?? 14,
+                        ),
                         const SizedBox(width: 16),
-                        Text('•  ${user?.city ?? "Ahmedabad"}', style: AppTypography.secondary),
+                        Text(
+                          '•  ${user?.city ?? "Ahmedabad"}',
+                          style: AppTypography.secondary,
+                        ),
                       ],
                     ),
                   ],
@@ -84,15 +106,35 @@ class ProfileScreen extends ConsumerWidget {
             Card(
               child: Column(
                 children: [
-                  _buildListTile(Icons.directions_car_outlined, 'My Vehicles & Registration', () {}),
+                  _buildListTile(
+                    Icons.directions_car_outlined,
+                    'My Vehicles & Registration',
+                    () {},
+                  ),
                   const Divider(color: AppColors.border, height: 1),
-                  _buildListTile(Icons.verified_user_outlined, 'Government Identity Verification', () {}),
+                  _buildListTile(
+                    Icons.verified_user_outlined,
+                    'Government Identity Verification',
+                    () {},
+                  ),
                   const Divider(color: AppColors.border, height: 1),
-                  _buildListTile(Icons.payment_outlined, 'Payment Methods & Escrow Wallet', () {}),
+                  _buildListTile(
+                    Icons.payment_outlined,
+                    'Payment Methods & Escrow Wallet',
+                    () {},
+                  ),
                   const Divider(color: AppColors.border, height: 1),
-                  _buildListTile(Icons.health_and_safety_outlined, 'Safety Center & Emergency Contacts', () {}),
+                  _buildListTile(
+                    Icons.health_and_safety_outlined,
+                    'Safety Center & Emergency Contacts',
+                    () {},
+                  ),
                   const Divider(color: AppColors.border, height: 1),
-                  _buildListTile(Icons.help_outline_rounded, 'Help & Support', () {}),
+                  _buildListTile(
+                    Icons.help_outline_rounded,
+                    'Help & Support',
+                    () {},
+                  ),
                 ],
               ),
             ),
@@ -100,8 +142,16 @@ class ProfileScreen extends ConsumerWidget {
             const SizedBox(height: 20),
 
             TextButton.icon(
-              icon: const Icon(Icons.logout_rounded, color: AppColors.mutedRust),
-              label: Text('Log Out', style: AppTypography.button.copyWith(color: AppColors.mutedRust)),
+              icon: const Icon(
+                Icons.logout_rounded,
+                color: AppColors.mutedRust,
+              ),
+              label: Text(
+                'Log Out',
+                style: AppTypography.button.copyWith(
+                  color: AppColors.mutedRust,
+                ),
+              ),
               onPressed: () {
                 ref.read(authProvider.notifier).logout();
                 context.go('/login');
@@ -117,7 +167,10 @@ class ProfileScreen extends ConsumerWidget {
     return ListTile(
       leading: Icon(icon, color: AppColors.primaryForest),
       title: Text(title, style: AppTypography.bodyLarge),
-      trailing: const Icon(Icons.chevron_right_rounded, color: AppColors.textSecondary),
+      trailing: const Icon(
+        Icons.chevron_right_rounded,
+        color: AppColors.textSecondary,
+      ),
       onTap: onTap,
     );
   }

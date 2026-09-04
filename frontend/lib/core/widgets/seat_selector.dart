@@ -42,7 +42,10 @@ class SeatSelector extends StatelessWidget {
               Text('Select Seat(s)', style: AppTypography.sectionHeader),
               Text(
                 '${selectedSeats.length} seat(s) selected',
-                style: AppTypography.secondary.copyWith(color: AppColors.primaryForest, fontWeight: FontWeight.bold),
+                style: AppTypography.secondary.copyWith(
+                  color: AppColors.primaryForest,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),
@@ -64,7 +67,10 @@ class SeatSelector extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.airline_seat_recline_normal, color: AppColors.textSecondary),
+                    const Icon(
+                      Icons.airline_seat_recline_normal,
+                      color: AppColors.textSecondary,
+                    ),
                     const SizedBox(height: 4),
                     Text('Driver', style: AppTypography.caption),
                   ],

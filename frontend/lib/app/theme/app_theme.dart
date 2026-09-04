@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 import 'app_typography.dart';
 
 /// Sahyān Application Theme configuration.
 abstract class AppTheme {
   static ThemeData get lightTheme {
+    final baseTextTheme = GoogleFonts.plusJakartaSansTextTheme();
     return ThemeData(
       useMaterial3: true,
       scaffoldBackgroundColor: AppColors.warmBackground,
@@ -17,6 +19,17 @@ abstract class AppTheme {
         onSurface: AppColors.textPrimary,
         error: AppColors.mutedRust,
         onError: AppColors.white,
+      ),
+      textTheme: baseTextTheme.copyWith(
+        displayLarge: AppTypography.displayHero,
+        headlineLarge: AppTypography.screenTitle,
+        headlineMedium: AppTypography.sectionHeader,
+        titleMedium: AppTypography.fieldLabel,
+        bodyLarge: AppTypography.bodyLarge,
+        bodyMedium: AppTypography.bodyMedium,
+        bodySmall: AppTypography.secondary,
+        labelLarge: AppTypography.button,
+        labelSmall: AppTypography.caption,
       ),
       appBarTheme: AppBarTheme(
         backgroundColor: AppColors.warmBackground,
@@ -45,7 +58,9 @@ abstract class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          textStyle: AppTypography.button.copyWith(color: AppColors.primaryForest),
+          textStyle: AppTypography.button.copyWith(
+            color: AppColors.primaryForest,
+          ),
         ),
       ),
       cardTheme: CardThemeData(
@@ -60,7 +75,10 @@ abstract class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.white,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
         hintStyle: AppTypography.secondary,
         labelStyle: AppTypography.secondary,
         border: OutlineInputBorder(
@@ -73,7 +91,10 @@ abstract class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.primaryForest, width: 1.5),
+          borderSide: const BorderSide(
+            color: AppColors.primaryForest,
+            width: 1.5,
+          ),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),

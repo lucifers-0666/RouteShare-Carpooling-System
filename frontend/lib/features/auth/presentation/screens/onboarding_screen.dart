@@ -82,7 +82,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               onPressed: _handleSkip,
               child: Text(
                 'Skip',
-                style: AppTypography.button.copyWith(color: AppColors.primaryForest),
+                style: AppTypography.button.copyWith(
+                  color: AppColors.primaryForest,
+                ),
               ),
             ),
         ],
@@ -105,7 +107,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         itemBuilder: (context, index) {
                           final item = _items[index];
                           return SingleChildScrollView(
-                            padding: const EdgeInsets.symmetric(horizontal: 28.0, vertical: 12.0),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 28.0,
+                              vertical: 12.0,
+                            ),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.center,
@@ -118,7 +123,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                                     color: AppColors.softForest,
                                     shape: BoxShape.circle,
                                     border: Border.all(
-                                      color: AppColors.primaryForest.withValues(alpha: 0.15),
+                                      color: AppColors.primaryForest.withValues(
+                                        alpha: 0.15,
+                                      ),
                                       width: 2,
                                     ),
                                   ),
@@ -130,7 +137,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                                 ),
                                 const SizedBox(height: 32),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: AppColors.softForest,
                                     borderRadius: BorderRadius.circular(20),
@@ -173,7 +183,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
                     // Controls Section
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 28.0, vertical: 20.0),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 28.0,
+                        vertical: 20.0,
+                      ),
                       child: Column(
                         children: [
                           Row(
@@ -182,7 +195,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                               _items.length,
                               (index) => AnimatedContainer(
                                 duration: const Duration(milliseconds: 250),
-                                margin: const EdgeInsets.symmetric(horizontal: 4),
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 4,
+                                ),
                                 width: _currentPage == index ? 28 : 8,
                                 height: 8,
                                 decoration: BoxDecoration(
@@ -196,7 +211,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                           ),
                           const SizedBox(height: 24),
                           PrimaryButton(
-                            text: _currentPage == _items.length - 1 ? 'Get Started' : 'Next',
+                            text: _currentPage == _items.length - 1
+                                ? 'Get Started'
+                                : 'Next',
                             icon: _currentPage == _items.length - 1
                                 ? Icons.arrow_forward_rounded
                                 : Icons.arrow_forward_ios_rounded,
