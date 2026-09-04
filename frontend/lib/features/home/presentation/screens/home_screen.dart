@@ -170,54 +170,82 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       children: [
                         // Date Picker
                         Expanded(
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                            decoration: BoxDecoration(
-                              color: AppColors.white,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: AppColors.border),
-                            ),
-                            child: Row(
-                              children: [
-                                const Icon(Icons.calendar_today_rounded, size: 18, color: AppColors.textSecondary),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text('Date', style: AppTypography.caption),
-                                      Text('Today, 3 Sep', style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.bold)),
-                                    ],
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(12),
+                            onTap: () async {
+                              final picked = await showDatePicker(
+                                context: context,
+                                initialDate: _selectedDate,
+                                firstDate: DateTime.now(),
+                                lastDate: DateTime.now().add(const Duration(days: 30)),
+                              );
+                              if (picked != null) {
+                                setState(() => _selectedDate = picked);
+                              }
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                              decoration: BoxDecoration(
+                                color: AppColors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: AppColors.border),
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.calendar_today_rounded, size: 18, color: AppColors.textSecondary),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text('Date', style: AppTypography.caption),
+                                        Text(
+                                          '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
+                                          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.bold),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ),
                         const SizedBox(width: 12),
                         // Seat Count
                         Expanded(
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                            decoration: BoxDecoration(
-                              color: AppColors.white,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: AppColors.border),
-                            ),
-                            child: Row(
-                              children: [
-                                const Icon(Icons.airline_seat_recline_normal_rounded, size: 20, color: AppColors.textSecondary),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text('Passengers', style: AppTypography.caption),
-                                      Text('1 Seat', style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.bold)),
-                                    ],
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(12),
+                            onTap: () {
+                              setState(() {
+                                _selectedSeats = (_selectedSeats % 4) + 1;
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                              decoration: BoxDecoration(
+                                color: AppColors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: AppColors.border),
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.airline_seat_recline_normal_rounded, size: 20, color: AppColors.textSecondary),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text('Passengers', style: AppTypography.caption),
+                                        Text(
+                                          '$_selectedSeats Seat${_selectedSeats > 1 ? 's' : ''}',
+                                          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.bold),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ),

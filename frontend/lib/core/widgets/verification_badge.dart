@@ -21,7 +21,7 @@ class VerificationBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.softBrass,
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: AppColors.mutedBrass.withOpacity(0.4), width: 1),
+        border: Border.all(color: AppColors.mutedBrass.withValues(alpha: 0.4), width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

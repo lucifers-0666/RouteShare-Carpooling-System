@@ -83,7 +83,7 @@ class SeatSelectionScreen extends ConsumerWidget {
                   children: [
                     _buildLegendItem(AppColors.warmBackground, AppColors.border, 'Available'),
                     _buildLegendItem(AppColors.softForest, AppColors.primaryForest, 'Selected'),
-                    _buildLegendItem(AppColors.border.withOpacity(0.4), AppColors.border, 'Occupied'),
+                    _buildLegendItem(AppColors.border.withValues(alpha: 0.4), AppColors.border, 'Occupied'),
                   ],
                 ),
               ),

@@ -118,7 +118,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                                     color: AppColors.softForest,
                                     shape: BoxShape.circle,
                                     border: Border.all(
-                                      color: AppColors.primaryForest.withOpacity(0.15),
+                                      color: AppColors.primaryForest.withValues(alpha: 0.15),
                                       width: 2,
                                     ),
                                   ),

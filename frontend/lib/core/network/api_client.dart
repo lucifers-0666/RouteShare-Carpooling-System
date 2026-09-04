@@ -176,6 +176,7 @@ class ApiClient {
   }
 
   Exception _handleError(dynamic error) {
+    _resolvedBaseUrl = null;
     if (error is ApiException) return error;
     if (error is TimeoutException) {
       return ApiException('Connection timed out. Please verify the backend server is running and port 5000 is forwarded.');

@@ -100,9 +100,9 @@ class SeatSelector extends StatelessWidget {
     Color iconColor = AppColors.textSecondary;
 
     if (!isAvailable) {
-      bgColor = AppColors.border.withOpacity(0.4);
-      textColor = AppColors.textSecondary.withOpacity(0.5);
-      iconColor = AppColors.textSecondary.withOpacity(0.4);
+      bgColor = AppColors.border.withValues(alpha: 0.4);
+      textColor = AppColors.textSecondary.withValues(alpha: 0.5);
+      iconColor = AppColors.textSecondary.withValues(alpha: 0.4);
     } else if (isSelected) {
       bgColor = AppColors.softForest;
       borderColor = AppColors.primaryForest;

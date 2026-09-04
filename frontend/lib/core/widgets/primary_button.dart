@@ -25,7 +25,7 @@ class PrimaryButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: effectiveOnPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: isDisabled ? AppColors.mutedSage.withOpacity(0.4) : AppColors.primaryForest,
+        backgroundColor: isDisabled ? AppColors.mutedSage.withValues(alpha: 0.4) : AppColors.primaryForest,
         foregroundColor: AppColors.white,
         elevation: 0,
         minimumSize: const Size(double.infinity, 50),

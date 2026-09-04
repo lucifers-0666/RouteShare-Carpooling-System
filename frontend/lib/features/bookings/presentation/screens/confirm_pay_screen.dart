@@ -135,7 +135,7 @@ class _ConfirmPayScreenState extends ConsumerState<ConfirmPayScreen> {
               decoration: BoxDecoration(
                 color: AppColors.softBrass,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColors.mutedBrass.withOpacity(0.4)),
+                border: Border.all(color: AppColors.mutedBrass.withValues(alpha: 0.4)),
               ),
               child: Row(
                 children: [
