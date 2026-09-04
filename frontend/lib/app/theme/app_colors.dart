@@ -26,6 +26,7 @@ abstract class AppColors {
 
   /// Card / Surface Pure White
   static const Color white = Color(0xFFFFFFFF);
+  static const Color cardBackground = Color(0xFFFFFFFF);
 
   /// Dividers and Input Borders
   static const Color border = Color(0xFFE2E7E3);

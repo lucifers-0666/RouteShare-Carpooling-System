@@ -30,6 +30,14 @@ abstract class AppTypography {
     height: 1.3,
   );
 
+  /// Card titles within widgets
+  static TextStyle get cardTitle => GoogleFonts.plusJakartaSans(
+    fontSize: 16,
+    fontWeight: FontWeight.w700,
+    color: AppColors.textPrimary,
+    height: 1.3,
+  );
+
   /// Field labels above input controls
   static TextStyle get fieldLabel => GoogleFonts.plusJakartaSans(
     fontSize: 14,

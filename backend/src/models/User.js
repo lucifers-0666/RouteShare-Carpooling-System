@@ -67,11 +67,28 @@ const userSchema = new mongoose.Schema(
       average: { type: Number, default: 4.9 },
       count: { type: Number, default: 0 },
     },
+    bio: {
+      type: String,
+      maxlength: [140, 'Bio cannot exceed 140 characters'],
+      default: '',
+    },
     emergencyContacts: [
       {
-        name: String,
-        phone: String,
-        relationship: String,
+        name: {
+          type: String,
+          required: [true, 'Contact name is required'],
+          trim: true,
+        },
+        phone: {
+          type: String,
+          required: [true, 'Contact phone is required'],
+          trim: true,
+        },
+        relationship: {
+          type: String,
+          default: 'Family',
+          trim: true,
+        },
       },
     ],
     preferences: {

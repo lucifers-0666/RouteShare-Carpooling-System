@@ -130,6 +130,22 @@ class ApiClient {
     }
   }
 
+  Future<dynamic> put(String endpoint, {Map<String, dynamic>? body}) async {
+    try {
+      final activeBase = await _resolveEffectiveBaseUrl();
+      final response = await _client
+          .put(
+            Uri.parse('$activeBase$endpoint'),
+            headers: _headers,
+            body: body != null ? jsonEncode(body) : null,
+          )
+          .timeout(const Duration(seconds: 7));
+      return _processResponse(response);
+    } catch (e) {
+      throw _handleError(e);
+    }
+  }
+
   Future<dynamic> patch(String endpoint, {Map<String, dynamic>? body}) async {
     try {
       final activeBase = await _resolveEffectiveBaseUrl();

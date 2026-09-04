@@ -16,6 +16,8 @@ import '../../features/bookings/presentation/screens/confirm_pay_screen.dart';
 import '../../features/bookings/presentation/screens/booking_confirmation_screen.dart';
 import '../../features/bookings/presentation/screens/my_bookings_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
+import '../../features/profile/presentation/screens/edit_profile_screen.dart';
+import '../../features/profile/presentation/screens/emergency_contacts_screen.dart';
 import '../../shared/widgets/app_shell.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -50,6 +52,14 @@ final appRouter = GoRouter(
       },
     ),
     GoRoute(path: '/otp', builder: (context, state) => const OtpScreen()),
+    GoRoute(
+      path: '/edit-profile',
+      builder: (context, state) => const EditProfileScreen(),
+    ),
+    GoRoute(
+      path: '/emergency-contacts',
+      builder: (context, state) => const EmergencyContactsScreen(),
+    ),
     GoRoute(
       path: '/search-results',
       builder: (context, state) => const SearchResultsScreen(),

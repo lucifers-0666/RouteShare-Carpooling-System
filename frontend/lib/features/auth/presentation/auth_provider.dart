@@ -240,6 +240,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  void updateUser(UserModel user) {
+    state = state.copyWith(user: user);
+  }
+
   Future<void> logout() async {
     await storageService.clearSession();
     apiClient.setAuthToken(null);
