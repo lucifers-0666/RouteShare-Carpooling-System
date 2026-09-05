@@ -1,24 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../features/auth/presentation/screens/splash_screen.dart';
-import '../../features/auth/presentation/screens/onboarding_screen.dart';
-import '../../features/auth/presentation/screens/auth_decision_screen.dart';
-import '../../features/auth/presentation/screens/login_screen.dart';
-import '../../features/auth/presentation/screens/register_screen.dart';
-import '../../features/auth/presentation/screens/forgot_password_screen.dart';
-import '../../features/auth/presentation/screens/reset_password_screen.dart';
-import '../../features/auth/presentation/screens/otp_screen.dart';
-import '../../features/home/presentation/screens/home_screen.dart';
-import '../../features/rides/presentation/screens/search_results_screen.dart';
-import '../../features/rides/presentation/screens/ride_details_screen.dart';
-import '../../features/rides/presentation/screens/seat_selection_screen.dart';
-import '../../features/bookings/presentation/screens/confirm_pay_screen.dart';
-import '../../features/bookings/presentation/screens/booking_confirmation_screen.dart';
-import '../../features/bookings/presentation/screens/my_bookings_screen.dart';
-import '../../features/profile/presentation/screens/profile_screen.dart';
-import '../../features/profile/presentation/screens/edit_profile_screen.dart';
-import '../../features/profile/presentation/screens/emergency_contacts_screen.dart';
-import '../../shared/widgets/app_shell.dart';
+import 'package:sahyan/features/auth/presentation/screens/splash_screen.dart';
+import 'package:sahyan/features/auth/presentation/screens/onboarding_screen.dart';
+import 'package:sahyan/features/auth/presentation/screens/auth_decision_screen.dart';
+import 'package:sahyan/features/auth/presentation/screens/login_screen.dart';
+import 'package:sahyan/features/auth/presentation/screens/register_screen.dart';
+import 'package:sahyan/features/auth/presentation/screens/forgot_password_screen.dart';
+import 'package:sahyan/features/auth/presentation/screens/reset_password_screen.dart';
+import 'package:sahyan/features/auth/presentation/screens/otp_screen.dart';
+import 'package:sahyan/features/home/presentation/screens/home_screen.dart';
+import 'package:sahyan/features/rides/presentation/screens/search_results_screen.dart';
+import 'package:sahyan/features/rides/presentation/screens/ride_details_screen.dart';
+import 'package:sahyan/features/rides/presentation/screens/seat_selection_screen.dart';
+import 'package:sahyan/features/bookings/presentation/screens/confirm_pay_screen.dart';
+import 'package:sahyan/features/bookings/presentation/screens/booking_confirmation_screen.dart';
+import 'package:sahyan/features/bookings/presentation/screens/my_bookings_screen.dart';
+import 'package:sahyan/features/profile/presentation/screens/profile_screen.dart';
+import 'package:sahyan/features/profile/presentation/screens/edit_profile_screen.dart';
+import 'package:sahyan/features/profile/presentation/screens/emergency_contacts_screen.dart';
+import 'package:sahyan/features/vehicles/domain/vehicle_model.dart';
+import 'package:sahyan/features/vehicles/presentation/screens/my_vehicles_screen.dart';
+import 'package:sahyan/features/vehicles/presentation/screens/add_vehicle_screen.dart';
+import 'package:sahyan/features/vehicles/presentation/screens/edit_vehicle_screen.dart';
+import 'package:sahyan/shared/widgets/app_shell.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -59,6 +63,21 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/emergency-contacts',
       builder: (context, state) => const EmergencyContactsScreen(),
+    ),
+    GoRoute(
+      path: '/vehicles',
+      builder: (context, state) => const MyVehiclesScreen(),
+    ),
+    GoRoute(
+      path: '/vehicles/add',
+      builder: (context, state) => const AddVehicleScreen(),
+    ),
+    GoRoute(
+      path: '/vehicles/edit',
+      builder: (context, state) {
+        final vehicle = state.extra as VehicleModel;
+        return EditVehicleScreen(vehicle: vehicle);
+      },
     ),
     GoRoute(
       path: '/search-results',

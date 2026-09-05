@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'router/app_router.dart';
-import 'theme/app_theme.dart';
+import 'package:sahyan/app/router/app_router.dart';
+import 'package:sahyan/app/theme/app_theme.dart';
 
 class SahyanApp extends StatelessWidget {
   const SahyanApp({super.key});

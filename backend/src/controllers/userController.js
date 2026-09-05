@@ -105,13 +105,22 @@ const updatePreferences = async (req, res, next) => {
     }
 
     if (notifications !== undefined) {
-      user.preferences.notifications = Boolean(notifications);
+      if (typeof notifications !== 'boolean') {
+        return res.status(400).json({ success: false, message: 'notifications preference must be a boolean' });
+      }
+      user.preferences.notifications = notifications;
     }
     if (allowSmoking !== undefined) {
-      user.preferences.allowSmoking = Boolean(allowSmoking);
+      if (typeof allowSmoking !== 'boolean') {
+        return res.status(400).json({ success: false, message: 'allowSmoking preference must be a boolean' });
+      }
+      user.preferences.allowSmoking = allowSmoking;
     }
     if (allowPets !== undefined) {
-      user.preferences.allowPets = Boolean(allowPets);
+      if (typeof allowPets !== 'boolean') {
+        return res.status(400).json({ success: false, message: 'allowPets preference must be a boolean' });
+      }
+      user.preferences.allowPets = allowPets;
     }
 
     user.markModified('preferences');

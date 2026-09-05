@@ -30,7 +30,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     super.initState();
     final user = ref.read(authProvider).user;
     _nameController = TextEditingController(text: user?.name ?? '');
-    _cityController = TextEditingController(text: user?.city ?? 'Ahmedabad');
+    _cityController = TextEditingController(text: user?.city ?? '');
     _bioController = TextEditingController(text: user?.bio ?? '');
 
     _notifications = user?.preferences.notifications ?? true;
@@ -122,7 +122,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                               child: Text(
                                 _nameController.text.isNotEmpty
                                     ? _nameController.text[0].toUpperCase()
-                                    : 'A',
+                                    : 'U',
                                 style: AppTypography.screenTitle.copyWith(
                                   fontSize: 38,
                                   color: AppColors.primaryForest,
@@ -136,7 +136,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                                 shape: BoxShape.circle,
                               ),
                               child: const Icon(
-                                Icons.camera_alt_outlined,
+                                Icons.person_outline_rounded,
                                 size: 18,
                                 color: Colors.white,
                               ),
@@ -147,11 +147,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       const SizedBox(height: 8),
                       Center(
                         child: Text(
-                          'Profile Photo',
+                          'Profile initials displayed. Custom photo upload will be available in upcoming release.',
                           style: AppTypography.caption.copyWith(
                             color: AppColors.textSecondary,
                             fontWeight: FontWeight.w500,
                           ),
+                          textAlign: TextAlign.center,
                         ),
                       ),
 
@@ -208,7 +209,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                               const SizedBox(height: 16),
                               AppTextField(
                                 label: 'Phone Number',
-                                hint: '+91 9876543210',
+                                hint: 'Registered phone number',
                                 controller: TextEditingController(
                                   text: user?.phone ?? '',
                                 ),
@@ -223,16 +224,22 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      const Icon(
-                                        Icons.verified_rounded,
-                                        size: 16,
-                                        color: AppColors.primaryForest,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        'Verified',
-                                        style: AppTypography.caption.copyWith(
+                                      if (user?.isVerified == true) ...[
+                                        const Icon(
+                                          Icons.verified_rounded,
+                                          size: 16,
                                           color: AppColors.primaryForest,
+                                        ),
+                                        const SizedBox(width: 4),
+                                      ],
+                                      Text(
+                                        user?.isVerified == true
+                                            ? 'Verified'
+                                            : 'Pending',
+                                        style: AppTypography.caption.copyWith(
+                                          color: user?.isVerified == true
+                                              ? AppColors.primaryForest
+                                              : AppColors.textSecondary,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
@@ -243,7 +250,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                               const SizedBox(height: 16),
                               AppTextField(
                                 label: 'Email Address',
-                                hint: 'name@example.com',
+                                hint: 'Registered email address',
                                 controller: TextEditingController(
                                   text: user?.email ?? '',
                                 ),
@@ -258,16 +265,22 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      const Icon(
-                                        Icons.verified_rounded,
-                                        size: 16,
-                                        color: AppColors.primaryForest,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        'Registered',
-                                        style: AppTypography.caption.copyWith(
+                                      if (user?.email.isNotEmpty == true) ...[
+                                        const Icon(
+                                          Icons.verified_rounded,
+                                          size: 16,
                                           color: AppColors.primaryForest,
+                                        ),
+                                        const SizedBox(width: 4),
+                                      ],
+                                      Text(
+                                        user?.email.isNotEmpty == true
+                                            ? 'Registered'
+                                            : 'Pending',
+                                        style: AppTypography.caption.copyWith(
+                                          color: user?.email.isNotEmpty == true
+                                              ? AppColors.primaryForest
+                                              : AppColors.textSecondary,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
@@ -278,7 +291,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                               const SizedBox(height: 16),
                               AppTextField(
                                 label: 'City / Base Location',
-                                hint: 'e.g. Ahmedabad, Gujarat',
+                                hint: 'e.g. Surat, Gujarat',
                                 controller: _cityController,
                                 prefixIcon: const Icon(
                                   Icons.location_on_outlined,

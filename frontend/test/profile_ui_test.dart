@@ -36,6 +36,9 @@ class MockSecureStorageService implements SecureStorageService {
 }
 
 class MockAuthRepository implements AuthRepository {
+  final UserModel Function()? userGetter;
+  MockAuthRepository([this.userGetter]);
+
   @override
   Future<Map<String, dynamic>> login({
     required String identifier,
@@ -63,16 +66,18 @@ class MockAuthRepository implements AuthRepository {
     required String newPassword,
   }) async => {};
   @override
-  Future<UserModel> getProfile() async => const UserModel(
-    id: 'u123',
-    name: 'Arjun Patel',
-    phone: '+919876543210',
-    email: 'arjun@example.com',
-    city: 'Ahmedabad',
-    verificationStatus: UserVerificationStatus.verified,
-    rating: 4.9,
-    totalRides: 14,
-  );
+  Future<UserModel> getProfile() async => userGetter != null
+      ? userGetter!()
+      : const UserModel(
+          id: 'u123',
+          name: 'Arjun Patel',
+          phone: '+919876543210',
+          email: 'arjun@example.com',
+          city: 'Ahmedabad',
+          verificationStatus: UserVerificationStatus.verified,
+          rating: 4.9,
+          totalRides: 14,
+        );
 }
 
 class MockProfileRepository implements ProfileRepository {
@@ -188,6 +193,20 @@ class MockProfileRepository implements ProfileRepository {
   }
 }
 
+class TestAuthNotifier extends AuthNotifier {
+  TestAuthNotifier(AuthState initialState)
+    : super(
+        repository: MockAuthRepository(),
+        storageService: MockSecureStorageService(),
+        apiClient: ApiClient(),
+      ) {
+    state = initialState;
+  }
+
+  @override
+  Future<void> checkAuthStatus() async {}
+}
+
 Widget createTestApp({
   required Widget child,
   required MockProfileRepository profileRepo,
@@ -199,16 +218,18 @@ Widget createTestApp({
       secureStorageServiceProvider.overrideWithValue(
         MockSecureStorageService(),
       ),
-      authRepositoryProvider.overrideWithValue(MockAuthRepository()),
+      authRepositoryProvider.overrideWithValue(
+        MockAuthRepository(() => profileRepo.user),
+      ),
       apiClientProvider.overrideWithValue(ApiClient()),
       authProvider.overrideWith((ref) {
-        final notifier = AuthNotifier(
-          repository: MockAuthRepository(),
-          storageService: MockSecureStorageService(),
-          apiClient: ApiClient(),
+        return TestAuthNotifier(
+          AuthState(
+            status: AuthStatus.authenticated,
+            user: profileRepo.user,
+            token: 'fake_token',
+          ),
         );
-        notifier.updateUser(profileRepo.user);
-        return notifier;
       }),
     ],
     child: MaterialApp(
@@ -242,12 +263,91 @@ void main() {
         expect(find.text('+919876543210'), findsWidgets);
         expect(find.text('arjun@example.com'), findsWidgets);
         expect(find.text('Phone Verified'), findsOneWidget);
+        expect(find.byIcon(Icons.verified_user_rounded), findsOneWidget);
         expect(find.text('Trust & Safety Status'), findsOneWidget);
         expect(find.text('Edit Profile & Preferences'), findsOneWidget);
         expect(find.text('Safety Center & SOS Contacts'), findsOneWidget);
         expect(find.text('Log Out'), findsOneWidget);
       },
     );
+
+    testWidgets('Verification badge hidden when user is unverified', (
+      tester,
+    ) async {
+      mockRepo.user = mockRepo.user.copyWith(
+        verificationStatus: UserVerificationStatus.pending,
+      );
+      await tester.pumpWidget(
+        createTestApp(child: const ProfileScreen(), profileRepo: mockRepo),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Phone Verified'), findsNothing);
+      expect(find.byIcon(Icons.verified_user_rounded), findsNothing);
+      expect(find.text('Pending'), findsWidgets);
+    });
+
+    testWidgets('Renders loading state when auth is loading', (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            profileRepositoryProvider.overrideWithValue(mockRepo),
+            secureStorageServiceProvider.overrideWithValue(
+              MockSecureStorageService(),
+            ),
+            authRepositoryProvider.overrideWithValue(
+              MockAuthRepository(() => mockRepo.user),
+            ),
+            apiClientProvider.overrideWithValue(ApiClient()),
+            authProvider.overrideWith((ref) {
+              return TestAuthNotifier(
+                const AuthState(status: AuthStatus.loading),
+              );
+            }),
+          ],
+          child: MaterialApp(
+            theme: AppTheme.lightTheme,
+            home: const ProfileScreen(),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(find.text('Account Profile'), findsOneWidget);
+    });
+
+    testWidgets('Renders error and retry state when user is null', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            profileRepositoryProvider.overrideWithValue(mockRepo),
+            secureStorageServiceProvider.overrideWithValue(
+              MockSecureStorageService(),
+            ),
+            authRepositoryProvider.overrideWithValue(
+              MockAuthRepository(() => mockRepo.user),
+            ),
+            apiClientProvider.overrideWithValue(ApiClient()),
+            authProvider.overrideWith((ref) {
+              return TestAuthNotifier(
+                const AuthState(status: AuthStatus.unauthenticated, user: null),
+              );
+            }),
+          ],
+          child: MaterialApp(
+            theme: AppTheme.lightTheme,
+            home: const ProfileScreen(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Unable to Load Profile'), findsOneWidget);
+      expect(find.text('Retry Loading'), findsOneWidget);
+    });
 
     testWidgets('Help & Support dialog opens and closes cleanly', (
       tester,
@@ -264,7 +364,7 @@ void main() {
 
       expect(
         find.text(
-          'Sahyān Support is available 24/7. For urgent inquiries, route assistance, or safety reports, please reach out via emergency contacts or email support@sahyan.in.',
+          'For assistance during your journey, use the Emergency Contacts section to notify your trusted safety circle. Additional customer support channels and route assistance guides will be available in upcoming releases.',
         ),
         findsOneWidget,
       );
@@ -272,7 +372,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(
         find.text(
-          'Sahyān Support is available 24/7. For urgent inquiries, route assistance, or safety reports, please reach out via emergency contacts or email support@sahyan.in.',
+          'For assistance during your journey, use the Emergency Contacts section to notify your trusted safety circle. Additional customer support channels and route assistance guides will be available in upcoming releases.',
         ),
         findsNothing,
       );

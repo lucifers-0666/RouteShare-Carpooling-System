@@ -189,6 +189,27 @@ test('PREFERENCES: PUT /users/preferences updates notifications, smoking, pets',
   assert.strictEqual(dbUser.preferences.allowPets, true);
 });
 
+test('PREFERENCES: PUT /users/preferences rejects non-boolean values with 400', async () => {
+  const invalidPayload = {
+    notifications: 'true',
+    allowSmoking: 1,
+  };
+
+  const res = await fetch(`${baseUrl}/users/preferences`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${tokenA}`,
+    },
+    body: JSON.stringify(invalidPayload),
+  });
+
+  assert.strictEqual(res.status, 400);
+  const data = await res.json();
+  assert.strictEqual(data.success, false);
+  assert.strictEqual(data.message, 'notifications preference must be a boolean');
+});
+
 test('EMERGENCY CONTACTS: CRUD flow and validation', async () => {
   // 1. Initial list should be empty
   let listRes = await fetch(`${baseUrl}/users/emergency-contacts`, {
