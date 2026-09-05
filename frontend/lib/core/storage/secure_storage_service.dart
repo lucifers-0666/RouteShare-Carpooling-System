@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import '../../shared/models/user_model.dart';
+import 'package:sahyan/shared/models/user_model.dart';
 
 class SecureStorageService {
   final FlutterSecureStorage _storage;

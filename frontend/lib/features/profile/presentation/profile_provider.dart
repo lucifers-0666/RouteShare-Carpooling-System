@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../auth/presentation/auth_provider.dart';
-import '../../../shared/models/user_model.dart';
-import '../data/profile_repository.dart';
+import 'package:sahyan/features/auth/presentation/auth_provider.dart';
+import 'package:sahyan/shared/models/user_model.dart';
+import 'package:sahyan/features/profile/data/profile_repository.dart';
 
 final profileRepositoryProvider = Provider<ProfileRepository>((ref) {
   final apiClient = ref.watch(apiClientProvider);

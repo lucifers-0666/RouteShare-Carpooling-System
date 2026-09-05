@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../app/theme/app_colors.dart';
-import '../../../../app/theme/app_typography.dart';
-import '../../../../core/widgets/app_text_field.dart';
-import '../../../../core/widgets/primary_button.dart';
-import '../../../auth/presentation/auth_provider.dart';
-import '../profile_provider.dart';
+import 'package:sahyan/app/theme/app_colors.dart';
+import 'package:sahyan/app/theme/app_typography.dart';
+import 'package:sahyan/core/widgets/app_text_field.dart';
+import 'package:sahyan/core/widgets/primary_button.dart';
+import 'package:sahyan/features/auth/presentation/auth_provider.dart';
+import 'package:sahyan/features/profile/presentation/profile_provider.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {
   const EditProfileScreen({super.key});

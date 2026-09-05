@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
-import 'location_model.dart';
-import 'vehicle_model.dart';
+import 'package:sahyan/features/vehicles/domain/vehicle_model.dart';
+import 'package:sahyan/shared/models/location_model.dart';
 
 enum RideStatus { scheduled, inProgress, completed, cancelled }
 

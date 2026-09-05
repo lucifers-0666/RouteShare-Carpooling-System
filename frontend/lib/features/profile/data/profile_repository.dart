@@ -1,6 +1,6 @@
-import '../../../core/network/api_client.dart';
-import '../../../core/storage/secure_storage_service.dart';
-import '../../../shared/models/user_model.dart';
+import 'package:sahyan/core/network/api_client.dart';
+import 'package:sahyan/core/storage/secure_storage_service.dart';
+import 'package:sahyan/shared/models/user_model.dart';
 
 abstract class ProfileRepository {
   Future<UserModel> getProfile();

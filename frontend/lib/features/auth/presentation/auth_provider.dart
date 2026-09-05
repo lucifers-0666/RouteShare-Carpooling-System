@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/network/api_client.dart';
-import '../../../core/storage/secure_storage_service.dart';
-import '../../../shared/models/user_model.dart';
-import '../data/auth_repository.dart';
+import 'package:sahyan/core/network/api_client.dart';
+import 'package:sahyan/core/storage/secure_storage_service.dart';
+import 'package:sahyan/shared/models/user_model.dart';
+import 'package:sahyan/features/auth/data/auth_repository.dart';
 
 enum AuthStatus { initial, loading, authenticated, unauthenticated, error }
 

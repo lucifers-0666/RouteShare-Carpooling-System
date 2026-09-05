@@ -32,6 +32,8 @@ class VehicleModel extends Equatable {
   });
 
   String get displayName => '$make $model';
+  String get fullName =>
+      color.isNotEmpty ? '$make $model ($color)' : '$make $model';
 
   String get typeDisplay {
     switch (vehicleType.toLowerCase()) {

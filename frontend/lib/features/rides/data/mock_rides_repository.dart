@@ -1,6 +1,6 @@
-import '../../../shared/models/ride_model.dart';
-import '../../../shared/models/location_model.dart';
-import '../../../shared/models/vehicle_model.dart';
+import 'package:sahyan/features/vehicles/domain/vehicle_model.dart';
+import 'package:sahyan/shared/models/location_model.dart';
+import 'package:sahyan/shared/models/ride_model.dart';
 
 abstract class RidesRepository {
   Future<List<RideModel>> searchRides({
@@ -26,11 +26,12 @@ class MockRidesRepository implements RidesRepository {
         ownerId: 'driver_rohit',
         make: 'Honda',
         model: 'City',
+        year: 2022,
         color: 'White',
         registrationNumber: 'GJ-01-AB-1234',
-        capacity: 4,
+        seatCapacity: 4,
         vehicleType: 'Sedan',
-        isVerified: true,
+        status: 'active',
       ),
       origin: const LocationModel(
         address: 'ISCON Cross Road, SG Highway',
@@ -67,11 +68,12 @@ class MockRidesRepository implements RidesRepository {
         ownerId: 'driver_neha',
         make: 'Maruti',
         model: 'Swift Dzire',
+        year: 2021,
         color: 'Silver',
         registrationNumber: 'GJ-03-CD-5678',
-        capacity: 4,
+        seatCapacity: 4,
         vehicleType: 'Sedan',
-        isVerified: true,
+        status: 'active',
       ),
       origin: const LocationModel(
         address: 'Prahlad Nagar',
@@ -108,11 +110,12 @@ class MockRidesRepository implements RidesRepository {
         ownerId: 'driver_amit',
         make: 'Hyundai',
         model: 'Creta',
+        year: 2023,
         color: 'Black',
         registrationNumber: 'GJ-05-EF-9012',
-        capacity: 4,
+        seatCapacity: 4,
         vehicleType: 'SUV',
-        isVerified: true,
+        status: 'active',
       ),
       origin: const LocationModel(
         address: 'Buldana Expressway Interchange',

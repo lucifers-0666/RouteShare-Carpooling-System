@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../app/providers/app_startup_provider.dart';
-import '../../../../app/theme/app_colors.dart';
-import '../../../../app/theme/app_typography.dart';
-import '../../../../core/widgets/primary_button.dart';
+import 'package:sahyan/app/providers/app_startup_provider.dart';
+import 'package:sahyan/app/theme/app_colors.dart';
+import 'package:sahyan/app/theme/app_typography.dart';
+import 'package:sahyan/core/widgets/primary_button.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});

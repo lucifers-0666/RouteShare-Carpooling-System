@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../app/theme/app_colors.dart';
-import '../../../../app/theme/app_typography.dart';
-import '../../../../core/widgets/verification_badge.dart';
-import '../../../../core/widgets/rating_display.dart';
-import '../../../../core/widgets/primary_button.dart';
-import '../../../auth/presentation/auth_provider.dart';
+import 'package:sahyan/app/theme/app_colors.dart';
+import 'package:sahyan/app/theme/app_typography.dart';
+import 'package:sahyan/core/widgets/verification_badge.dart';
+import 'package:sahyan/core/widgets/rating_display.dart';
+import 'package:sahyan/core/widgets/primary_button.dart';
+import 'package:sahyan/features/auth/presentation/auth_provider.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
